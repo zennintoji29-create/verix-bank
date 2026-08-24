@@ -157,4 +157,28 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`🛡️ Verix Web Dashboard listening on port ${PORT}`);
+  initKeepAliveDaemon();
 });
+
+// ── 🔄 Automated 10-Minute Render Keep-Alive Daemon ──
+const https = require('https');
+const BACKEND_RENDER_URL = 'https://fruadsih.onrender.com';
+
+function initKeepAliveDaemon() {
+  function pingServices() {
+    const timestamp = new Date().toLocaleTimeString();
+    console.log(`[Keep-Alive ${timestamp}] 📡 Pinging ${BACKEND_RENDER_URL}...`);
+    
+    https.get(BACKEND_RENDER_URL, (res) => {
+      console.log(`[Keep-Alive ${timestamp}] ✓ Live backend responded (${res.statusCode})`);
+    }).on('error', (err) => {
+      console.warn(`[Keep-Alive ${timestamp}] ⚠️ Ping error:`, err.message);
+    });
+  }
+
+  // Initial ping on boot
+  pingServices();
+  // Continuous 10-minute heartbeat (600,000 ms)
+  setInterval(pingServices, 10 * 60 * 1000);
+}
+
