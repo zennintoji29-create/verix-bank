@@ -83,14 +83,23 @@ server.listen(PORT, '0.0.0.0', () => {
 
 // ── 🔄 Automated 10-Minute Render Keep-Alive Daemon ──
 function initKeepAliveDaemon() {
+  const PORTAL_URL = 'https://verix-bank.onrender.com';
   function pingServices() {
     const timestamp = new Date().toLocaleTimeString();
-    console.log(`[Keep-Alive ${timestamp}] 📡 Sending heartbeat to ${BACKEND_RENDER_URL}...`);
+    console.log(`[Keep-Alive ${timestamp}] 📡 Sending heartbeat mesh...`);
     
-    https.get(BACKEND_RENDER_URL, (res) => {
-      console.log(`[Keep-Alive ${timestamp}] ✓ Live backend responded (${res.statusCode})`);
+    // 1. Ping Backend
+    https.get(`${BACKEND_RENDER_URL}/api/health`, (res) => {
+      console.log(`[Keep-Alive ${timestamp}] ✓ Backend (${BACKEND_RENDER_URL}) responded (${res.statusCode})`);
     }).on('error', (err) => {
-      console.warn(`[Keep-Alive ${timestamp}] ⚠️ Ping status:`, err.message);
+      console.warn(`[Keep-Alive ${timestamp}] ⚠️ Backend ping status:`, err.message);
+    });
+
+    // 2. Ping Bank Portal self
+    https.get(`${PORTAL_URL}/health`, (res) => {
+      console.log(`[Keep-Alive ${timestamp}] ✓ Portal (${PORTAL_URL}) responded (${res.statusCode})`);
+    }).on('error', (err) => {
+      console.warn(`[Keep-Alive ${timestamp}] ⚠️ Portal ping status:`, err.message);
     });
   }
 
@@ -99,3 +108,4 @@ function initKeepAliveDaemon() {
   // Continuous 10-minute heartbeat (600,000 ms)
   setInterval(pingServices, 10 * 60 * 1000);
 }
+
