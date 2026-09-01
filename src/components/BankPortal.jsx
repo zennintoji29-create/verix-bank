@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Building2, ShieldCheck, ShieldAlert, AlertTriangle, CheckCircle2, 
   XCircle, RefreshCw, Filter, Search, Database, Users, TrendingUp, 
@@ -8,7 +8,7 @@ import {
   ExternalLink, Eye, PlusCircle, AlertCircle, History, Trash2, Archive, RotateCcw,
   Download, Copy, ChevronLeft, ChevronsLeft, ChevronsRight, X, Layers,
   Globe, BarChart3, Activity, Gauge, Map, Sliders, Cpu, GitBranch, Target, Zap,
-  DollarSign, Crosshair, Award, CheckSquare, ChevronDown, PieChart, Volume2
+  DollarSign, Crosshair, Award, CheckSquare, ChevronDown, PieChart, Volume2, Satellite
 } from 'lucide-react';
 import { INITIAL_THREAT_RECORDS } from '../threatData.js';
 import { playRegionalVoiceWarning, playThreatSiren } from '../utils/audioAlerts.js';
@@ -20,247 +20,201 @@ import { playRegionalVoiceWarning, playThreatSiren } from '../utils/audioAlerts.
 const INDIA_STATES_HEATMAP_DATA = [
   {
     id: 'JH',
-    state: 'Jharkhand',
+    state: 'JHARKHAND',
     capital: 'Ranchi',
-    hotspots: ['Jamtara', 'Deoghar', 'Giridih', 'Dumka'],
+    hotspots: 'Jamtara, Deoghar, Giridih, Dumka',
     riskIndex: 96.8,
     activeThreatNodes: 3840,
-    blockedVolumeCr: 18.4,
+    blockedVolumeCr: '18.40',
     primaryModus: 'Bank KYC Expiry, SIM Swap & AnyDesk Screen Share',
-    topMuleBanks: ['State Bank of India', 'Punjab National Bank', 'India Post Payments Bank'],
-    dominantBranchIFSC: 'SBIN0001234, PUNB0182400',
+    topMuleBanks: ['State Bank of India', 'Punjab National Bank', 'India Post'],
+    dominantBranchIFSC: ['SBIN0001234', 'PUNB0182400', 'IPOS0000001'],
     severity: 'CRITICAL',
     vulnerabilityRank: '#1',
-    coordinates: { x: 67, y: 44 }, // Percentage coordinates on India Map canvas
+    coordinates: { x: 67, y: 44 },
     pinCodes: [
-      { pin: '815351', city: 'Jamtara Sadar', risk: 98.6, mules: 1420, blockedVPAs: 890, amount: '₹8.42 Cr', primary: 'Bank KYC & OTP Forwarding' },
-      { pin: '814112', city: 'Deoghar Cyber Belt', risk: 95.2, mules: 980, blockedVPAs: 610, amount: '₹5.15 Cr', primary: 'Electricity SMS Scam' },
-      { pin: '815301', city: 'Giridih Town', risk: 91.4, mules: 740, blockedVPAs: 420, amount: '₹3.20 Cr', primary: 'Fake Credit Card Reward' }
+      { pin: '815351', district: 'Jamtara', mules: 1420, blocked: '₹8.42 Cr', type: 'KYC' },
+      { pin: '814112', district: 'Deoghar', mules: 980, blocked: '₹5.15 Cr', type: 'POWER_CUT' },
+      { pin: '815301', district: 'Giridih', mules: 740, blocked: '₹3.20 Cr', type: 'REWARD' },
+      { pin: '814101', district: 'Dumka', mules: 700, blocked: '₹1.63 Cr', type: 'SIM_SWAP' }
     ]
   },
   {
     id: 'HR',
-    state: 'Haryana',
+    state: 'HARYANA',
     capital: 'Chandigarh',
-    hotspots: ['Nuh / Mewat', 'Gurugram', 'Faridabad', 'Palwal'],
+    hotspots: 'Nuh, Gurugram, Faridabad, Palwal',
     riskIndex: 95.9,
     activeThreatNodes: 3620,
-    blockedVolumeCr: 16.9,
-    primaryModus: 'Sextortion, Police Officer Impersonation & OLX Vehicle Fraud',
+    blockedVolumeCr: '16.90',
+    primaryModus: 'Sextortion, Police Impersonation & OLX Vehicle Scams',
     topMuleBanks: ['HDFC Bank', 'Axis Bank', 'IndusInd Bank'],
-    dominantBranchIFSC: 'HDFC0001842, UTIB0002914',
+    dominantBranchIFSC: ['HDFC0001842', 'UTIB0002914', 'INDB0000412'],
     severity: 'CRITICAL',
     vulnerabilityRank: '#2',
     coordinates: { x: 38, y: 28 },
     pinCodes: [
-      { pin: '122107', city: 'Nuh / Mewat', risk: 97.9, mules: 2180, blockedVPAs: 1340, amount: '₹11.60 Cr', primary: 'Sextortion & Fake DSP Calls' },
-      { pin: '122002', city: 'Gurugram Cyber Hub', risk: 88.4, mules: 890, blockedVPAs: 540, amount: '₹4.10 Cr', primary: 'Stock Trading & IPO Mules' },
-      { pin: '121001', city: 'Faridabad Industrial', risk: 85.1, mules: 550, blockedVPAs: 310, amount: '₹1.20 Cr', primary: 'Advance QR Scanner Request' }
+      { pin: '122107', district: 'Nuh/Mewat', mules: 2180, blocked: '₹11.60 Cr', type: 'SEXTO' },
+      { pin: '122002', district: 'Gurugram', mules: 890, blocked: '₹4.10 Cr', type: 'STOCK' },
+      { pin: '121001', district: 'Faridabad', mules: 550, blocked: '₹1.20 Cr', type: 'OLX' }
     ]
   },
   {
     id: 'RJ',
-    state: 'Rajasthan',
+    state: 'RAJASTHAN',
     capital: 'Jaipur',
-    hotspots: ['Bharatpur', 'Alwar', 'Deeg', 'Jaipur'],
+    hotspots: 'Bharatpur, Alwar, Deeg, Jaipur',
     riskIndex: 94.7,
     activeThreatNodes: 3150,
-    blockedVolumeCr: 14.2,
-    primaryModus: 'OLX Fake Army Officer, Advance QR Code Scam',
-    topMuleBanks: ['Bank of Baroda', 'State Bank of India', 'AU Small Finance Bank'],
-    dominantBranchIFSC: 'BARB0BHARAT, SBIN0000318',
+    blockedVolumeCr: '14.20',
+    primaryModus: 'Fake Army Officer OLX, Advance QR Code Requests',
+    topMuleBanks: ['Bank of Baroda', 'State Bank of India', 'AU Small Finance'],
+    dominantBranchIFSC: ['BARB0BHARAT', 'SBIN0000318', 'AUBL0002011'],
     severity: 'CRITICAL',
     vulnerabilityRank: '#3',
     coordinates: { x: 32, y: 35 },
     pinCodes: [
-      { pin: '321001', city: 'Bharatpur Cyber Corridor', risk: 96.4, mules: 1840, blockedVPAs: 920, amount: '₹9.15 Cr', primary: 'Army Officer OLX QR' },
-      { pin: '301001', city: 'Alwar Border', risk: 92.8, mules: 810, blockedVPAs: 480, amount: '₹3.40 Cr', primary: 'Advance Token Payments' },
-      { pin: '302001', city: 'Jaipur Central', risk: 82.3, mules: 500, blockedVPAs: 290, amount: '₹1.65 Cr', primary: 'Lottery & KBC Fraud' }
+      { pin: '321001', district: 'Bharatpur', mules: 1840, blocked: '₹9.15 Cr', type: 'OLX_ARMY' },
+      { pin: '301001', district: 'Alwar', mules: 810, blocked: '₹3.40 Cr', type: 'ADVANCE_QR' },
+      { pin: '302001', district: 'Jaipur', mules: 500, blocked: '₹1.65 Cr', type: 'LOTTERY' }
     ]
   },
   {
     id: 'DL',
-    state: 'Delhi (NCR)',
+    state: 'DELHI NCR',
     capital: 'New Delhi',
-    hotspots: ['Connaught Place', 'Dwarka', 'Noida Sec 62', 'Ghaziabad'],
+    hotspots: 'Connaught Place, Dwarka, Noida Sec 62',
     riskIndex: 93.4,
     activeThreatNodes: 2980,
-    blockedVolumeCr: 22.7,
+    blockedVolumeCr: '22.70',
     primaryModus: 'CBI / ED Digital Arrest & Customs Narcotic Parcel Extortion',
-    topMuleBanks: ['ICICI Bank', 'HDFC Bank', 'Kotak Mahindra Bank'],
-    dominantBranchIFSC: 'ICIC0000007, HDFC0000003',
+    topMuleBanks: ['ICICI Bank', 'HDFC Bank', 'Kotak Mahindra'],
+    dominantBranchIFSC: ['ICIC0000007', 'HDFC0000003', 'KKBK0000195'],
     severity: 'CRITICAL',
     vulnerabilityRank: '#4',
     coordinates: { x: 41, y: 30 },
     pinCodes: [
-      { pin: '110001', city: 'Connaught Place', risk: 93.1, mules: 1120, blockedVPAs: 760, amount: '₹14.80 Cr', primary: 'Digital Arrest & CBI Notice' },
-      { pin: '201309', city: 'Noida Sector 62', risk: 90.7, mules: 810, blockedVPAs: 520, amount: '₹6.75 Cr', primary: 'Power Cut Disconnection SMS' },
-      { pin: '110075', city: 'Dwarka Sector 10', risk: 86.4, mules: 610, blockedVPAs: 380, amount: '₹3.10 Cr', primary: 'Customs Courier Extortion' }
+      { pin: '110001', district: 'Connaught Pl', mules: 1120, blocked: '₹14.80 Cr', type: 'DIGITAL_ARREST' },
+      { pin: '201309', district: 'Noida Sec 62', mules: 810, blocked: '₹6.75 Cr', type: 'POWER_CUT' },
+      { pin: '110075', district: 'Dwarka', mules: 610, blocked: '₹3.10 Cr', type: 'CUSTOMS' }
     ]
   },
   {
     id: 'WB',
-    state: 'West Bengal',
+    state: 'WEST BENGAL',
     capital: 'Kolkata',
-    hotspots: ['Kolkata Salt Lake', 'Sector V', 'Asansol', 'Siliguri'],
+    hotspots: 'Salt Lake Sec V, Rajarhat, Asansol',
     riskIndex: 90.2,
     activeThreatNodes: 2450,
-    blockedVolumeCr: 12.6,
+    blockedVolumeCr: '12.60',
     primaryModus: 'Fake Tech Support Call Centers & State Electricity Bill SMS',
     topMuleBanks: ['Bandhan Bank', 'State Bank of India', 'UCO Bank'],
-    dominantBranchIFSC: 'BDBL0000124, SBIN0004087',
+    dominantBranchIFSC: ['BDBL0000124', 'SBIN0004087', 'UCBA0000014'],
     severity: 'CRITICAL',
     vulnerabilityRank: '#5',
     coordinates: { x: 74, y: 48 },
     pinCodes: [
-      { pin: '700091', city: 'Salt Lake Sector V', risk: 91.5, mules: 950, blockedVPAs: 680, amount: '₹8.20 Cr', primary: 'Fake Microsoft Tech Support' },
-      { pin: '700001', city: 'Kolkata Central GPO', risk: 87.2, mules: 720, blockedVPAs: 440, amount: '₹3.10 Cr', primary: 'Electricity SMS Phishing' },
-      { pin: '713301', city: 'Asansol Industrial', risk: 84.0, mules: 490, blockedVPAs: 290, amount: '₹1.30 Cr', primary: 'Loan Waiver Scams' }
+      { pin: '700091', district: 'Salt Lake V', mules: 950, blocked: '₹8.20 Cr', type: 'TECH_SUPPORT' },
+      { pin: '700001', district: 'Kolkata GPO', mules: 720, blocked: '₹3.10 Cr', type: 'POWER_CUT' },
+      { pin: '713301', district: 'Asansol', mules: 490, blocked: '₹1.30 Cr', type: 'LOAN_WAIVER' }
     ]
   },
   {
     id: 'MH',
-    state: 'Maharashtra',
+    state: 'MAHARASHTRA',
     capital: 'Mumbai',
-    hotspots: ['Mumbai BKC', 'Pune', 'Thane', 'Navi Mumbai'],
+    hotspots: 'Mumbai BKC, Pune, Thane, Navi Mumbai',
     riskIndex: 88.5,
     activeThreatNodes: 2890,
-    blockedVolumeCr: 28.4,
+    blockedVolumeCr: '28.40',
     primaryModus: 'Institutional Stock Trading Mules & Pre-IPO Allotment Fraud',
-    topMuleBanks: ['HDFC Bank', 'ICICI Bank', 'Standard Chartered', 'Axis Bank'],
-    dominantBranchIFSC: 'HDFC0000060, AXIS0000128',
+    topMuleBanks: ['HDFC Bank', 'ICICI Bank', 'Standard Chartered'],
+    dominantBranchIFSC: ['HDFC0000060', 'ICIC0000004', 'SCBL0036001'],
     severity: 'HIGH',
     vulnerabilityRank: '#6',
     coordinates: { x: 33, y: 56 },
     pinCodes: [
-      { pin: '400051', city: 'Bandra-Kurla Complex (BKC)', risk: 88.2, mules: 780, blockedVPAs: 590, amount: '₹18.50 Cr', primary: 'High-Yield Stock Mules' },
-      { pin: '411001', city: 'Pune Cantonment', risk: 84.6, mules: 620, blockedVPAs: 410, amount: '₹6.20 Cr', primary: 'Pre-IPO Allocation Schemes' },
-      { pin: '400601', city: 'Thane West', risk: 81.9, mules: 490, blockedVPAs: 310, amount: '₹3.70 Cr', primary: 'Task Fraud UPI Layering' }
+      { pin: '400051', district: 'Mumbai BKC', mules: 780, blocked: '₹18.50 Cr', type: 'STOCK_IPO' },
+      { pin: '411001', district: 'Pune Cantt', mules: 620, blocked: '₹6.20 Cr', type: 'PRE_IPO' },
+      { pin: '400601', district: 'Thane West', mules: 490, blocked: '₹3.70 Cr', type: 'TASK_FRAUD' }
     ]
   },
   {
     id: 'KA',
-    state: 'Karnataka',
+    state: 'KARNATAKA',
     capital: 'Bengaluru',
-    hotspots: ['Bengaluru Koramangala', 'Whitefield', 'Mysuru', 'Hubballi'],
+    hotspots: 'Koramangala, Whitefield, Mysuru, Hubballi',
     riskIndex: 86.1,
     activeThreatNodes: 2110,
-    blockedVolumeCr: 17.3,
+    blockedVolumeCr: '17.30',
     primaryModus: 'Telegram Review/Rating Tasks & Crypto Arbitrage Scams',
-    topMuleBanks: ['Canara Bank', 'Kotak Mahindra Bank', 'State Bank of India'],
-    dominantBranchIFSC: 'CNRB0000001, KKBK0000421',
+    topMuleBanks: ['Canara Bank', 'Kotak Mahindra', 'State Bank of India'],
+    dominantBranchIFSC: ['CNRB0000001', 'KKBK0000421', 'SBIN0000813'],
     severity: 'HIGH',
     vulnerabilityRank: '#7',
     coordinates: { x: 42, y: 72 },
     pinCodes: [
-      { pin: '560001', city: 'Bengaluru Central GPO', risk: 84.8, mules: 620, blockedVPAs: 410, amount: '₹7.90 Cr', primary: 'Telegram YouTube Task Scam' },
-      { pin: '560034', city: 'Koramangala Tech Zone', risk: 82.5, mules: 510, blockedVPAs: 340, amount: '₹5.60 Cr', primary: 'Crypto Arbitrage Desks' },
-      { pin: '570001', city: 'Mysuru Urban', risk: 78.1, mules: 380, blockedVPAs: 220, amount: '₹3.80 Cr', primary: 'Hotel Booking Task Scam' }
+      { pin: '560001', district: 'Bengaluru GPO', mules: 620, blocked: '₹7.90 Cr', type: 'TELEGRAM_TASK' },
+      { pin: '560034', district: 'Koramangala', mules: 510, blocked: '₹5.60 Cr', type: 'CRYPTO_OTC' },
+      { pin: '570001', district: 'Mysuru Urban', mules: 380, blocked: '₹3.80 Cr', type: 'HOTEL_TASK' }
     ]
   },
   {
     id: 'GJ',
-    state: 'Gujarat',
+    state: 'GUJARAT',
     capital: 'Gandhinagar',
-    hotspots: ['Surat Diamond City', 'Ahmedabad Maninagar', 'Rajkot', 'Vadodara'],
+    hotspots: 'Surat, Ahmedabad Maninagar, Rajkot',
     riskIndex: 87.2,
     activeThreatNodes: 1980,
-    blockedVolumeCr: 15.8,
+    blockedVolumeCr: '15.80',
     primaryModus: 'Layered Current Account Mules & Hawala UPI Integration',
     topMuleBanks: ['ICICI Bank', 'Axis Bank', 'Bank of Baroda'],
-    dominantBranchIFSC: 'BARB0MANINA, ICIC0000045',
+    dominantBranchIFSC: ['BARB0MANINA', 'ICIC0000045', 'UTIB0000112'],
     severity: 'HIGH',
     vulnerabilityRank: '#8',
     coordinates: { x: 23, y: 47 },
     pinCodes: [
-      { pin: '380008', city: 'Ahmedabad (Maninagar)', risk: 86.9, mules: 540, blockedVPAs: 380, amount: '₹9.40 Cr', primary: 'Hawala Mule Accounts' },
-      { pin: '395003', city: 'Surat Varachha', risk: 84.1, mules: 490, blockedVPAs: 320, amount: '₹4.30 Cr', primary: 'Layered Current Account' },
-      { pin: '360001', city: 'Rajkot Junction', risk: 79.8, mules: 360, blockedVPAs: 210, amount: '₹2.10 Cr', primary: 'Diamond Merchant Fake QR' }
-    ]
-  },
-  {
-    id: 'UP',
-    state: 'Uttar Pradesh',
-    capital: 'Lucknow',
-    hotspots: ['Noida', 'Lucknow', 'Kanpur', 'Prayagraj'],
-    riskIndex: 89.8,
-    activeThreatNodes: 2740,
-    blockedVolumeCr: 16.1,
-    primaryModus: 'Electricity Power Cut SMS, Loan Waiver Scams',
-    topMuleBanks: ['State Bank of India', 'Punjab National Bank', 'Bank of India'],
-    dominantBranchIFSC: 'PUNB0182400, SBIN0005238',
-    severity: 'HIGH',
-    vulnerabilityRank: '#9',
-    coordinates: { x: 52, y: 35 },
-    pinCodes: [
-      { pin: '201301', city: 'Noida Sector 18', risk: 89.4, mules: 710, blockedVPAs: 490, amount: '₹7.20 Cr', primary: 'Electricity Bill Cut Phishing' },
-      { pin: '226001', city: 'Lucknow Hazratganj', risk: 84.2, mules: 580, blockedVPAs: 360, amount: '₹5.10 Cr', primary: 'Government Scheme Fraud' },
-      { pin: '208001', city: 'Kanpur Mall Road', risk: 81.0, mules: 460, blockedVPAs: 280, amount: '₹3.80 Cr', primary: 'Kisan Loan Waiver Scams' }
+      { pin: '380008', district: 'Maninagar', mules: 540, blocked: '₹9.40 Cr', type: 'HAWALA' },
+      { pin: '395003', district: 'Surat Varachha', mules: 490, blocked: '₹4.30 Cr', type: 'CURRENT_MULE' },
+      { pin: '360001', district: 'Rajkot Jn', mules: 360, blocked: '₹2.10 Cr', type: 'DIAMOND_QR' }
     ]
   },
   {
     id: 'TG',
-    state: 'Telangana',
+    state: 'TELANGANA',
     capital: 'Hyderabad',
-    hotspots: ['Cyberabad', 'HITEC City', 'Secunderabad', 'Warangal'],
+    hotspots: 'Cyberabad, HITEC City, Secunderabad',
     riskIndex: 84.6,
     activeThreatNodes: 1790,
-    blockedVolumeCr: 11.9,
+    blockedVolumeCr: '11.90',
     primaryModus: 'Instant Micro-Loan Apps & Photo Morphed Blackmail',
     topMuleBanks: ['Union Bank of India', 'State Bank of India', 'ICICI Bank'],
-    dominantBranchIFSC: 'UBIN0532185, HDFC0000521',
+    dominantBranchIFSC: ['UBIN0532185', 'HDFC0000521', 'SBIN0000851'],
     severity: 'HIGH',
-    vulnerabilityRank: '#10',
+    vulnerabilityRank: '#9',
     coordinates: { x: 46, y: 59 },
     pinCodes: [
-      { pin: '500081', city: 'Madhapur / HITEC City', risk: 83.9, mules: 690, blockedVPAs: 470, amount: '₹6.10 Cr', primary: 'Chinese Loan App Harassment' },
-      { pin: '500003', city: 'Secunderabad Station', risk: 80.5, mules: 450, blockedVPAs: 290, amount: '₹3.40 Cr', primary: 'Job Recruitment Scam' },
-      { pin: '506001', city: 'Warangal Urban', risk: 76.2, mules: 310, blockedVPAs: 180, amount: '₹2.40 Cr', primary: 'Fake Education Scholarship' }
-    ]
-  },
-  {
-    id: 'BR',
-    state: 'Bihar',
-    capital: 'Patna',
-    hotspots: ['Patna', 'Nawada', 'Gaya', 'Muzaffarpur'],
-    riskIndex: 88.0,
-    activeThreatNodes: 2240,
-    blockedVolumeCr: 9.8,
-    primaryModus: 'KBC Lottery Rewards & Fake Petrol Pump Allotment',
-    topMuleBanks: ['State Bank of India', 'Central Bank of India', 'Punjab National Bank'],
-    dominantBranchIFSC: 'CBIN0280001, SBIN0000152',
-    severity: 'HIGH',
-    vulnerabilityRank: '#11',
-    coordinates: { x: 69, y: 37 },
-    pinCodes: [
-      { pin: '800001', city: 'Patna GPO', risk: 87.5, mules: 620, blockedVPAs: 410, amount: '₹4.90 Cr', primary: 'KBC Lottery WhatsApp Scam' },
-      { pin: '805110', city: 'Nawada Sadar', risk: 85.0, mules: 540, blockedVPAs: 360, amount: '₹3.10 Cr', primary: 'Fake Petrol Pump Allotment' }
-    ]
-  },
-  {
-    id: 'TN',
-    state: 'Tamil Nadu',
-    capital: 'Chennai',
-    hotspots: ['Chennai Anna Nagar', 'Coimbatore', 'Madurai'],
-    riskIndex: 79.4,
-    activeThreatNodes: 1320,
-    blockedVolumeCr: 8.4,
-    primaryModus: 'FedEx Narcotic Parcel Extortion & Work-from-Home Tasks',
-    topMuleBanks: ['Indian Bank', 'Indian Overseas Bank', 'HDFC Bank'],
-    dominantBranchIFSC: 'IDIB000C001, IOBA0000001',
-    severity: 'MODERATE',
-    vulnerabilityRank: '#12',
-    coordinates: { x: 48, y: 84 },
-    pinCodes: [
-      { pin: '600040', city: 'Chennai Anna Nagar', risk: 79.2, mules: 440, blockedVPAs: 290, amount: '₹4.80 Cr', primary: 'FedEx Parcel Customs Call' },
-      { pin: '641001', city: 'Coimbatore Town', risk: 74.8, mules: 310, blockedVPAs: 190, amount: '₹2.10 Cr', primary: 'Part-Time Amazon Task Scam' }
+      { pin: '500081', district: 'Madhapur', mules: 690, blocked: '₹6.10 Cr', type: 'LOAN_HARASS' },
+      { pin: '500003', district: 'Secunderabad', mules: 450, blocked: '₹3.40 Cr', type: 'JOB_SCAM' }
     ]
   }
 ];
 
 export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
-  // Navigation tabs: 'fraud_heatmap' | 'statistics_impact' | 'disputes' | 'history' | 'database_search' | 'audio_lab' | 'sim_carrier' | 'advisories'
-  const [activeTab, setActiveTab] = useState('fraud_heatmap');
+  // Session / Authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [loginForm, setLoginForm] = useState({
+    fullName: 'Rajesh Verma, IPS',
+    password: '••••••••••••',
+    organization: 'State Bank of India',
+    state: 'Karnataka',
+    city: 'Bengaluru',
+    pinCode: '560001',
+    mobile: '9845012345'
+  });
+
+  // Navigation tabs: 'threat_heatmap' | 'database_search' | 'disputes' | 'statistics_impact' | 'audio_lab' | 'sim_carrier' | 'advisories'
+  const [activeTab, setActiveTab] = useState('threat_heatmap');
   const [appeals, setAppeals] = useState([]);
   const [threats, setThreats] = useState(() => Array.isArray(INITIAL_THREAT_RECORDS) ? INITIAL_THREAT_RECORDS : []);
   const [loading, setLoading] = useState(false);
@@ -268,27 +222,15 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
   const [actionSuccess, setActionSuccess] = useState('');
   
   // State Drilldown & Heatmap State
-  const [selectedStateId, setSelectedStateId] = useState('JH'); // Default to #1 hotspot Jharkhand
-  const [heatmapViewMode, setHeatmapViewMode] = useState('NATIONAL'); // 'NATIONAL' | 'PIN_EXPLORER'
+  const [selectedStateId, setSelectedStateId] = useState('JH');
   const [pinSearch, setPinSearch] = useState('');
   const [inspectorMode, setInspectorMode] = useState('UPI'); // 'UPI' | 'BANK'
-  const [inspectorVpa, setInspectorVpa] = useState('scammer.cybercell@oksbi');
+  const [inspectorVpa, setInspectorVpa] = useState('cbi.arrest99@ybl');
   const [inspectorAcc, setInspectorAcc] = useState('50100432918231');
   const [inspectorIfsc, setInspectorIfsc] = useState('SBIN0001234');
   
-  // Officer Profile
-  const [officerProfile, setOfficerProfile] = useState({
-    name: 'Rajesh Verma, IPS',
-    role: 'Nodal Cyber Fraud Compliance Officer',
-    bankName: 'State Bank of India',
-    postalCode: '560001',
-    city: 'Bengaluru, Karnataka',
-    stationCode: 'I4C-BLR-CYBER-042',
-    badgeId: 'IND-MHA-98214'
-  });
-  const [showProfileModal, setShowProfileModal] = useState(false);
+  // Modals & Details
   const [selectedTicket, setSelectedTicket] = useState(null);
-  const [selectedThreatRecord, setSelectedThreatRecord] = useState(null);
   const [showAddThreatModal, setShowAddThreatModal] = useState(false);
   const [newThreatIdentifier, setNewThreatIdentifier] = useState('');
   const [newThreatCategory, setNewThreatCategory] = useState('DIGITAL_ARREST');
@@ -339,8 +281,8 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           status: decision,
-          reviewerNotes: `Reviewed and resolved by Nodal Officer ${officerProfile.name}`,
-          resolvedBy: officerProfile.name
+          reviewerNotes: `Reviewed and resolved by Nodal Officer ${loginForm.fullName}`,
+          resolvedBy: loginForm.fullName
         })
       });
 
@@ -370,7 +312,7 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
       category: newThreatCategory,
       riskScore: 95,
       isBlacklisted: true,
-      source: `Manual Flag by ${officerProfile.name}`,
+      source: `Manual Flag by ${loginForm.fullName}`,
       reportCount: 1,
       details: newThreatDetails || 'Flagged during live compliance review.',
       reportedAt: new Date().toISOString()
@@ -385,88 +327,232 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
 
   const pendingCount = appeals.filter(a => a && a.status === 'PENDING_REVIEW').length;
 
-  return (
-    <div className="min-h-screen bg-[#090C10] text-[#DBE5DC] font-sans flex flex-col selection:bg-[#00F0A0] selection:text-[#090C10]">
-      
-      {/* ══════════════════════════════════════════════════════════════
-          TOP COMMAND APPBAR (Material / Institutional Clean Header)
-      ══════════════════════════════════════════════════════════════ */}
-      <header className="sticky top-0 w-full z-50 bg-[#0D1510]/95 backdrop-blur-xl border-b border-white/[0.08] flex items-center justify-between px-4 sm:px-6 h-16 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
-        
-        {/* Left: Branding & Govt Info */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#10141C] border border-[#00F0A0]/30 text-[#00F0A0] shadow-[0_0_15px_rgba(0,240,160,0.15)] shrink-0">
-            <Landmark className="w-5 h-5 stroke-[2.2]" />
+  // ════════════════════════════════════════════════════════════════════════════════
+  // 1. SECURE ACCESS TERMINAL (LOGIN SCREEN)
+  // ════════════════════════════════════════════════════════════════════════════════
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#000000] text-[#fadcd9] flex flex-col font-mono selection:bg-[#00F0A0] selection:text-[#000000]"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)',
+          backgroundSize: '32px 32px'
+        }}
+      >
+        {/* Top Minimal Bar */}
+        <header className="bg-[#000000] border-b border-white/[0.08] flex justify-between items-center px-6 h-16 fixed top-0 left-0 w-full z-50">
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold tracking-tight text-white font-sans">VERIX COMMAND</span>
           </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span className="text-base sm:text-lg font-bold text-white tracking-tight font-mono flex items-center gap-1.5">
-                VERIX <span className="text-[#00F0A0]">COMMAND</span>
-              </span>
-              <span className="text-[10px] text-[#00D2FF] bg-[#00D2FF]/10 px-2 py-0.5 rounded font-mono border border-[#00D2FF]/20 hidden md:inline-block">
-                I4C &amp; NPCI NATIONAL CYBER DEFENSE NODE
-              </span>
+          <div className="flex items-center gap-4 text-[#e4bdba] text-xs">
+            <span>SECURE TERMINAL ACCESS</span>
+          </div>
+        </header>
+
+        {/* Login Form Container */}
+        <main className="flex-1 flex items-center justify-center p-4 mt-16 pb-12 z-10">
+          <div className="w-full max-w-2xl bg-[#10141C] border border-white/[0.08] p-8 flex flex-col gap-5 shadow-2xl">
+            
+            {/* Card Header */}
+            <div className="flex flex-col items-center justify-center text-center pb-5 border-b border-white/[0.08]">
+              <div className="w-14 h-14 rounded-full border-2 border-[#00F0A0] flex items-center justify-center mb-3 bg-black">
+                <Landmark className="w-7 h-7 text-[#00F0A0]" />
+              </div>
+              <h1 className="text-2xl font-bold text-white tracking-wide font-sans">VERIX COMMAND</h1>
+              <p className="text-[11px] text-[#00F0A0] tracking-widest uppercase mt-1">
+                NATIONAL CYBER DEFENSE AUTHORITY — SECURE ACCESS TERMINAL
+              </p>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={(e) => { e.preventDefault(); setIsAuthenticated(true); }} className="flex flex-col gap-4">
+              
+              {/* Full Name */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] uppercase tracking-wider text-[#e4bdba]">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={loginForm.fullName}
+                  onChange={(e) => setLoginForm({ ...loginForm, fullName: e.target.value })}
+                  placeholder="ENTER AUTHORIZED NAME"
+                  className="bg-[#171E2B] border border-white/[0.08] p-3 text-xs text-[#fadcd9] focus:outline-none focus:border-[#00F0A0]"
+                />
+              </div>
+
+              {/* Admin Password */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] uppercase tracking-wider text-[#e4bdba]">Admin Password</label>
+                <input
+                  type="password"
+                  required
+                  value={loginForm.password}
+                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                  placeholder="••••••••••••"
+                  className="bg-[#171E2B] border border-white/[0.08] p-3 text-xs text-[#fadcd9] tracking-widest focus:outline-none focus:border-[#00F0A0]"
+                />
+              </div>
+
+              {/* Organization & State Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[11px] uppercase tracking-wider text-[#e4bdba]">Bank / Government Body</label>
+                  <select
+                    value={loginForm.organization}
+                    onChange={(e) => setLoginForm({ ...loginForm, organization: e.target.value })}
+                    className="bg-[#171E2B] border border-white/[0.08] p-3 text-xs text-[#fadcd9] focus:outline-none focus:border-[#00F0A0]"
+                  >
+                    <option value="State Bank of India">STATE BANK OF INDIA (SBI)</option>
+                    <option value="Reserve Bank of India">RESERVE BANK OF INDIA (RBI)</option>
+                    <option value="Ministry of Home Affairs">I4C / MINISTRY OF HOME AFFAIRS</option>
+                    <option value="HDFC Bank">HDFC BANK CYBER CELL</option>
+                    <option value="ICICI Bank">ICICI FRAUD CONTROL DESK</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[11px] uppercase tracking-wider text-[#e4bdba]">State Jurisdiction</label>
+                  <select
+                    value={loginForm.state}
+                    onChange={(e) => setLoginForm({ ...loginForm, state: e.target.value })}
+                    className="bg-[#171E2B] border border-white/[0.08] p-3 text-xs text-[#fadcd9] focus:outline-none focus:border-[#00F0A0]"
+                  >
+                    <option value="Karnataka">KARNATAKA (BLR-01)</option>
+                    <option value="Maharashtra">MAHARASHTRA (MUM-BKC)</option>
+                    <option value="Delhi NCT">DELHI NCR (DL-01-NX)</option>
+                    <option value="Jharkhand">JHARKHAND (JAM-01)</option>
+                    <option value="Haryana">HARYANA (NUH-MEW)</option>
+                    <option value="West Bengal">WEST BENGAL (KOL-SALT)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* City, PIN & Mobile */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[11px] uppercase tracking-wider text-[#e4bdba]">City</label>
+                  <input
+                    type="text"
+                    value={loginForm.city}
+                    onChange={(e) => setLoginForm({ ...loginForm, city: e.target.value })}
+                    className="bg-[#171E2B] border border-white/[0.08] p-3 text-xs text-[#fadcd9] focus:outline-none focus:border-[#00F0A0]"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[11px] uppercase tracking-wider text-[#e4bdba]">PIN Code</label>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={loginForm.pinCode}
+                    onChange={(e) => setLoginForm({ ...loginForm, pinCode: e.target.value })}
+                    className="bg-[#171E2B] border border-white/[0.08] p-3 text-xs text-[#fadcd9] focus:outline-none focus:border-[#00F0A0]"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[11px] uppercase tracking-wider text-[#e4bdba]">Mobile Number</label>
+                  <div className="flex">
+                    <span className="bg-[#10141C] border border-r-0 border-white/[0.08] p-3 text-xs text-[#e4bdba]">+91</span>
+                    <input
+                      type="tel"
+                      value={loginForm.mobile}
+                      onChange={(e) => setLoginForm({ ...loginForm, mobile: e.target.value })}
+                      className="bg-[#171E2B] border border-white/[0.08] p-3 text-xs text-[#fadcd9] w-full focus:outline-none focus:border-[#00F0A0]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Submit */}
+              <button
+                type="submit"
+                className="w-full py-4 mt-2 bg-[#00F0A0] hover:bg-[#00e296] text-black font-bold text-sm tracking-wider uppercase transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
+              >
+                <Terminal className="w-4 h-4" />
+                INITIALIZE TERMINAL
+              </button>
+            </form>
+
+            <div className="pt-3 border-t border-white/[0.08] text-center">
+              <p className="text-[11px] text-[#e4bdba] opacity-70 tracking-wider">
+                UNAUTHORIZED ACCESS IS PROHIBITED BY I4C PROTOCOLS. ALL SESSIONS MONITORED.
+              </p>
             </div>
           </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════════
+  // 2. FULL-BLOWN MISSION CONTROL DASHBOARD
+  // ════════════════════════════════════════════════════════════════════════════════
+  return (
+    <div className="h-screen bg-[#000000] text-[#fadcd9] flex flex-col font-mono overflow-hidden selection:bg-[#00F0A0] selection:text-[#000000]">
+      
+      {/* ── TOP NAV BAR ── */}
+      <header className="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 sm:px-6 border-b border-white/[0.08] bg-[#000000] h-16">
+        
+        {/* Left Branding */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Landmark className="w-6 h-6 text-[#FF4B4B]" />
+            <h1 className="text-lg font-bold text-[#FF4B4B] tracking-tight uppercase whitespace-nowrap font-sans">
+              VERIX COMMAND
+            </h1>
+          </div>
+          <div className="h-6 w-px bg-white/[0.08] mx-2 hidden sm:block" />
+          <span className="hidden lg:inline-block px-2 py-1 bg-[#171E2B] border border-white/[0.08] text-[#fadcd9] text-[10.5px] uppercase">
+            I4C &amp; NPCI NATIONAL CYBER DEFENSE NODE
+          </span>
         </div>
 
-        {/* Center: Glowing Ticker Ribbon */}
-        <div className="hidden lg:flex flex-1 mx-6 overflow-hidden bg-[#10141C] border border-white/[0.08] rounded-full h-8 relative items-center px-4">
-          <div className="flex items-center justify-between w-full font-mono text-xs gap-6">
-            <span className="flex items-center gap-1.5 text-[#00F0A0]">
-              <span className="w-2 h-2 rounded-full bg-[#00F0A0] animate-pulse" />
+        {/* Center Telemetry Ribbon */}
+        <div className="hidden xl:flex flex-1 justify-center px-4">
+          <div className="flex items-center gap-4 px-4 py-1.5 bg-[#171E2B] border border-white/[0.08] text-xs whitespace-nowrap">
+            <span className="text-[#00EF9F] flex items-center gap-1.5 font-bold">
+              <span className="w-2 h-2 rounded-full bg-[#00EF9F] animate-pulse" />
               Pre-Auth Shield: ACTIVE
             </span>
-            <span className="flex items-center gap-1.5 text-[#00D2FF]">
-              <Shield className="w-3.5 h-3.5" />
-              Fraud Prevented: <strong className="text-white">₹14.82 Cr</strong>
-            </span>
-            <span className="flex items-center gap-1.5 text-[#BAC5D5]">
-              <Clock className="w-3.5 h-3.5 text-[#00F0A0]" />
-              Sub-200ms Latency: <strong className="text-[#00F0A0]">184 ms</strong>
-            </span>
-            <span className="flex items-center gap-1.5 text-amber-300">
-              <Target className="w-3.5 h-3.5" />
-              Accuracy: <strong className="text-white">98.6%</strong>
-            </span>
+            <span className="text-white/[0.2]">|</span>
+            <span className="text-[#fadcd9]">Fraud Prevented: <strong className="text-white">₹14.82 Cr</strong></span>
+            <span className="text-white/[0.2]">|</span>
+            <span className="text-[#fadcd9]">Latency: <span className="text-[#00EF9F]">184ms</span></span>
+            <span className="text-white/[0.2]">|</span>
+            <span className="text-[#fadcd9]">ML Accuracy: <strong className="text-white">98.6%</strong></span>
+            <span className="text-white/[0.2]">|</span>
+            <span className="text-[#fadcd9]">False Negatives: <strong className="text-[#00EF9F]">0.00%</strong></span>
           </div>
         </div>
 
-        {/* Right: Actions & Profile Section */}
+        {/* Right Officer Profile & Containment */}
         <div className="flex items-center gap-3">
           {onOpenMobilePortal && (
             <button
               onClick={onOpenMobilePortal}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00F0A0]/10 hover:bg-[#00F0A0]/20 border border-[#00F0A0]/30 text-xs font-mono font-bold text-[#00F0A0] transition-all cursor-pointer shadow-sm active:scale-95"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[#10141C] hover:bg-[#171E2B] border border-[#00F0A0]/30 text-[#00F0A0] text-xs font-bold transition-all cursor-pointer"
             >
               <span>📱 Mobile View</span>
             </button>
           )}
 
-          {/* Profile Card Trigger */}
-          <button 
-            onClick={() => setShowProfileModal(true)}
-            className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-[#10141C] hover:bg-[#171E2B] border border-white/[0.08] transition-all cursor-pointer text-left"
-          >
-            <div className="w-7 h-7 rounded-lg bg-[#171E2B] border border-[#00F0A0]/30 flex items-center justify-center text-[#00F0A0] shrink-0 font-mono text-xs font-bold">
+          <div className="flex items-center gap-2 border border-white/[0.08] bg-[#171E2B] px-2.5 py-1">
+            <div className="w-6 h-6 bg-black border border-white/[0.1] flex items-center justify-center text-[10px] text-[#00F0A0] font-bold">
               RV
             </div>
             <div className="hidden sm:flex flex-col">
-              <span className="text-xs text-white font-semibold leading-tight">{officerProfile.bankName}</span>
-              <span className="text-[10px] text-[#8494A8] font-mono leading-tight">{officerProfile.name}</span>
+              <span className="text-xs text-[#fadcd9] leading-tight font-bold">{loginForm.fullName}</span>
+              <span className="text-[9px] text-[#e4bdba] leading-tight">{loginForm.organization}</span>
             </div>
-          </button>
+          </div>
 
-          {/* Emergency Containment Action */}
-          <button 
+          <button
             onClick={() => {
               playThreatSiren();
-              setActionSuccess('EMERGENCY LOCKDOWN: Pre-Auth Threat Shield Armed at 100% Interception');
+              setActionSuccess('EMERGENCY CONTAINMENT ACTIVATED: 100% PRE-AUTH HARD LOCK ENGAGED');
               setTimeout(() => setActionSuccess(''), 4000);
             }}
-            className="px-3 py-1.5 bg-[#FF4B4B]/10 hover:bg-[#FF4B4B]/20 border border-[#FF4B4B]/40 text-[#FF4B4B] rounded-lg font-mono text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-[0_0_15px_rgba(255,75,75,0.2)] active:scale-95"
+            className="bg-[#FF4B4B] hover:bg-rose-600 text-black font-bold text-xs px-3.5 py-2 transition-all cursor-pointer flex items-center gap-1.5 uppercase tracking-wider"
           >
-            <AlertOctagon className="w-3.5 h-3.5" />
+            <AlertOctagon className="w-4 h-4" />
             <span className="hidden sm:inline">EMERGENCY CONTAINMENT</span>
           </button>
         </div>
@@ -474,346 +560,306 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
 
       {/* ── ACTION NOTIFICATION TOAST ── */}
       {actionSuccess && (
-        <div className="mx-4 sm:mx-6 mt-3 p-3 rounded-xl bg-[#00F0A0]/15 border border-[#00F0A0]/40 text-[#00F0A0] text-xs font-mono font-bold flex items-center gap-2 animate-slide-down shadow-lg">
-          <CheckCircle2 className="w-4 h-4 text-[#00F0A0]" />
+        <div className="fixed top-18 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-[#00F0A0] text-black text-xs font-bold flex items-center gap-2 shadow-2xl">
+          <CheckCircle2 className="w-4 h-4 text-black" />
           <span>{actionSuccess}</span>
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════
-          MAIN WORKSPACE LAYOUT (Side Rail + Central Canvas + Right Inspector)
-      ══════════════════════════════════════════════════════════════ */}
-      <div className="flex-1 flex flex-col md:flex-row p-3 sm:p-5 gap-4 overflow-hidden">
+      {/* ── MAIN WORKSPACE BODY ── */}
+      <div className="flex flex-1 pt-16 h-full overflow-hidden">
         
-        {/* LEFT COMPACT NAVIGATION RAIL */}
-        <aside className="w-full md:w-56 shrink-0 flex flex-col gap-1.5 bg-[#10141C] border border-white/[0.08] rounded-2xl p-3 shadow-xl">
-          <span className="text-[10px] font-mono font-bold uppercase text-[#546274] px-2 mb-1 tracking-wider">
-            Surveillance Grid
-          </span>
-
-          {[
-            { id: 'fraud_heatmap', label: 'India Threat Maps', icon: Globe, count: 'Live', badgeColor: 'bg-[#00F0A0]/20 text-[#00F0A0]' },
-            { id: 'statistics_impact', label: 'ROI & Loss Reduction', icon: BarChart3, count: '₹14.8Cr', badgeColor: 'bg-cyan-400/20 text-cyan-300' },
-            { id: 'disputes', label: 'Appeals Queue', icon: FileText, count: pendingCount > 0 ? `${pendingCount} New` : appeals.length, badgeColor: pendingCount > 0 ? 'bg-amber-400/25 text-amber-300' : 'bg-white/10 text-white/70' },
-            { id: 'history', label: 'Disputes History', icon: History, count: 'Audit', badgeColor: 'bg-emerald-400/20 text-emerald-300' },
-            { id: 'database_search', label: 'Threat Registry', icon: Database, count: threats.length.toLocaleString(), badgeColor: 'bg-purple-400/20 text-purple-300' },
-            { id: 'audio_lab', label: 'Voice Phishing Lab', icon: Mic, count: 'AI', badgeColor: 'bg-rose-400/20 text-rose-300' },
-            { id: 'sim_carrier', label: 'SIM Swap Monitor', icon: Radio, count: 'IMSI', badgeColor: 'bg-blue-400/20 text-blue-300' },
-            { id: 'advisories', label: 'I4C Advisories', icon: BellRing, count: '3', badgeColor: 'bg-white/10 text-white/70' }
-          ].map(({ id, label, icon: Icon, count, badgeColor }) => (
-            <button
-              key={id}
-              onClick={() => setActiveTab(id)}
-              className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-mono transition-all cursor-pointer ${
-                activeTab === id
-                  ? 'bg-[#00F0A0]/15 text-[#00F0A0] font-bold border border-[#00F0A0]/30 shadow-sm'
-                  : 'text-[#8494A8] hover:text-white hover:bg-white/[0.04]'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <Icon className={`w-4 h-4 ${activeTab === id ? 'text-[#00F0A0]' : 'text-[#8494A8]'}`} />
-                <span className="truncate">{label}</span>
-              </div>
-              {count && <span className={`px-1.5 py-0.5 rounded text-[9.5px] font-bold ${badgeColor}`}>{count}</span>}
-            </button>
-          ))}
-
-          {/* Quick Telemetry Footnote */}
-          <div className="mt-auto pt-3 border-t border-white/[0.06] space-y-1 text-[10px] font-mono text-[#738294] p-1">
-            <div className="flex justify-between">
-              <span>Station:</span>
-              <span className="text-white truncate max-w-[90px]">{officerProfile.stationCode}</span>
+        {/* ── LEFT NAVIGATION RAIL (W-60 COMPACT) ── */}
+        <nav className="w-60 border-r border-white/[0.08] bg-[#10141C] flex flex-col shrink-0">
+          
+          <div className="p-4 border-b border-white/[0.08] flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full border border-white/[0.1] bg-black flex items-center justify-center text-[#00F0A0]">
+              <Shield className="w-4 h-4" />
             </div>
-            <div className="flex justify-between">
-              <span>Jurisdiction:</span>
-              <span className="text-[#00D2FF]">{selectedState.state}</span>
+            <div>
+              <div className="text-xs font-bold text-white">NATIONAL DEFENSE</div>
+              <div className="text-[10px] text-[#e4bdba]">V-01 COMMAND</div>
             </div>
           </div>
-        </aside>
 
-        {/* ══════════════════════════════════════════════════════════════
-            CENTER SURVEILLANCE STAGE (HEATMAP / DRILLDOWN)
-        ══════════════════════════════════════════════════════════════ */}
-        <main className="flex-1 flex flex-col gap-4 overflow-y-auto">
-          
-          {/* ────────────────────────────────────────────────────────
-              VIEW 1: 100% INDIA THREAT HEATMAP & STATE DRILLDOWN
-          ──────────────────────────────────────────────────────── */}
-          {activeTab === 'fraud_heatmap' && (
-            <div className="flex-1 flex flex-col gap-4">
-              
-              {/* Top View Mode & State Selector Bar */}
-              <div className="p-3.5 rounded-2xl bg-[#10141C] border border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-bold text-[#00F0A0] flex items-center gap-1.5">
-                    <Globe className="w-4 h-4 text-[#00F0A0]" /> National Threat Radar:
+          {/* Nav Items (7-Module Exact Order) */}
+          <div className="flex-1 py-3 overflow-y-auto flex flex-col gap-1 px-2">
+            {[
+              { id: 'threat_heatmap', label: 'Threat Heatmaps', icon: Globe, count: null },
+              { id: 'database_search', label: 'Threat Registry', icon: Database, count: threats.length.toLocaleString() },
+              { id: 'disputes', label: 'Appeals Review', icon: FileText, count: pendingCount > 0 ? `${pendingCount} PENDING` : null, alert: pendingCount > 0 },
+              { id: 'statistics_impact', label: 'ROI Analytics', icon: BarChart3, count: '₹14.8Cr' },
+              { id: 'audio_lab', label: 'Voice Phishing Lab', icon: Mic, count: 'AI' },
+              { id: 'sim_carrier', label: 'SIM Swap Monitor', icon: Radio, count: 'IMSI' },
+              { id: 'advisories', label: 'I4C Advisories', icon: BellRing, count: '3' }
+            ].map(({ id, label, icon: Icon, count, alert }) => (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={`w-full flex items-center justify-between px-3 py-2.5 text-xs transition-all cursor-pointer text-left ${
+                  activeTab === id
+                    ? 'bg-[#171E2B] text-[#00F0A0] border-l-4 border-[#00F0A0] font-bold'
+                    : 'text-[#e4bdba] hover:bg-[#171E2B] hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Icon className="w-4 h-4" />
+                  <span className="uppercase text-[11px]">{label}</span>
+                </div>
+                {count && (
+                  <span className={`text-[9px] px-1.5 py-0.5 border ${
+                    alert ? 'border-amber-400 bg-amber-400/20 text-amber-300 animate-pulse' : 'border-white/[0.08] bg-[#10141C] text-white'
+                  }`}>
+                    {count}
                   </span>
-                  <div className="flex items-center p-0.5 bg-[#090C10] border border-white/[0.08] rounded-xl text-xs font-mono">
-                    <button
-                      onClick={() => setHeatmapViewMode('NATIONAL')}
-                      className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                        heatmapViewMode === 'NATIONAL' ? 'bg-[#00F0A0] text-[#080B0F] font-bold shadow' : 'text-[#8494A8] hover:text-white'
-                      }`}
-                    >
-                      🇮🇳 State Heatmap
-                    </button>
-                    <button
-                      onClick={() => setHeatmapViewMode('PIN_EXPLORER')}
-                      className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                        heatmapViewMode === 'PIN_EXPLORER' ? 'bg-[#00F0A0] text-[#080B0F] font-bold shadow' : 'text-[#8494A8] hover:text-white'
-                      }`}
-                    >
-                      📍 PIN Explorer
-                    </button>
-                  </div>
-                </div>
+                )}
+              </button>
+            ))}
+          </div>
 
-                {/* State Dropdown Selector */}
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <span className="text-xs font-mono text-[#8494A8] shrink-0">Focus State:</span>
-                  <select
-                    value={selectedStateId}
-                    onChange={(e) => setSelectedStateId(e.target.value)}
-                    className="w-full sm:w-56 bg-[#090C10] border border-[#00F0A0]/40 rounded-xl py-1.5 px-3 text-xs font-mono font-bold text-white focus:outline-none focus:border-[#00F0A0] transition-all cursor-pointer"
-                  >
-                    {INDIA_STATES_HEATMAP_DATA.map((st) => (
-                      <option key={st.id} value={st.id} className="bg-[#10141C] text-white">
-                        {st.vulnerabilityRank} {st.state} ({st.riskIndex}% Risk)
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+          {/* Footer Telemetry */}
+          <div className="p-3 border-t border-white/[0.08] space-y-2">
+            <button
+              onClick={() => setIsAuthenticated(false)}
+              className="w-full py-1.5 border border-white/[0.08] bg-transparent text-[#fadcd9] hover:bg-[#171E2B] text-[11px] uppercase transition-colors"
+            >
+              LOGOUT TERMINAL
+            </button>
+            <div className="flex items-center justify-between text-[10px] text-[#e4bdba]">
+              <span>STATION: {loginForm.state.substring(0, 3).toUpperCase()}-01-NX</span>
+              <span className="flex items-center gap-1 text-[#00EF9F]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00EF9F] animate-pulse" />
+                DB_SYNC_OK
+              </span>
+            </div>
+          </div>
+        </nav>
 
-              {/* 2-Column Responsive Surveillance Stage */}
-              <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 flex-1">
+        {/* ── CENTER WORKSPACE ── */}
+        <main className="flex-1 flex flex-col p-2 gap-2 mr-80 overflow-hidden bg-[#000000]">
+          
+          {/* ══════════════════════════════════════════════════════════════
+              TAB 1: THREAT HEATMAPS (100% INDIA DRILLDOWN)
+          ══════════════════════════════════════════════════════════════ */}
+          {activeTab === 'threat_heatmap' && (
+            <div className="flex-1 flex flex-col gap-2 min-h-0">
+              
+              {/* 60/40 Split Canvas */}
+              <div className="flex-1 flex gap-2 min-h-0">
                 
-                {/* Visual SVG Map Canvas (7 Cols) */}
-                <div className="xl:col-span-7 p-4 rounded-2xl bg-[#10141C] border border-white/[0.08] relative min-h-[360px] flex flex-col justify-between overflow-hidden shadow-xl">
-                  <div className="flex items-center justify-between z-10">
-                    <span className="text-xs font-mono uppercase text-[#8494A8] flex items-center gap-1.5">
-                      <ShieldAlert className="w-3.5 h-3.5 text-[#00F0A0]" />
-                      Interactive National Surveillance Grid (Click State to Drill Down)
-                    </span>
-                    <span className="text-[10px] font-mono text-[#00D2FF] bg-[#00D2FF]/10 px-2 py-0.5 rounded border border-[#00D2FF]/20">
-                      Live GPS Sync
-                    </span>
+                {/* Left 60%: India Geospatial Telemetry */}
+                <div className="w-3/5 bg-[#10141C] border border-white/[0.08] flex flex-col relative overflow-hidden">
+                  
+                  {/* Top Header of Map */}
+                  <div className="p-2.5 bg-[#171E2B] border-b border-white/[0.08] flex justify-between items-center z-10">
+                    <div className="flex items-center gap-2">
+                      <Satellite className="w-4 h-4 text-[#00F0A0]" />
+                      <span className="text-[11px] uppercase tracking-wider text-white font-bold">
+                        India Geospatial Telemetry
+                      </span>
+                    </div>
+
+                    {/* State Selector Dropdown */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-[#e4bdba]">Focus:</span>
+                      <select
+                        value={selectedStateId}
+                        onChange={(e) => setSelectedStateId(e.target.value)}
+                        className="bg-[#000000] border border-white/[0.1] text-xs text-[#00F0A0] py-0.5 px-2 focus:outline-none"
+                      >
+                        {INDIA_STATES_HEATMAP_DATA.map(st => (
+                          <option key={st.id} value={st.id}>{st.vulnerabilityRank} {st.state} ({st.riskIndex}%)</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
-                  {/* Interactive SVG India Grid Map */}
-                  <div className="relative w-full h-72 sm:h-80 my-2 flex items-center justify-center">
-                    {/* SVG Base Silhouette */}
-                    <svg viewBox="0 0 100 100" className="w-full h-full max-h-72 opacity-90 filter drop-shadow-[0_0_15px_rgba(0,240,160,0.1)]">
-                      {/* Stylized India Geometric Landmass */}
+                  {/* Interactive Vector Grid Map Canvas */}
+                  <div className="flex-1 relative flex items-center justify-center p-4"
+                    style={{
+                      backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)',
+                      backgroundSize: '32px 32px'
+                    }}
+                  >
+                    {/* SVG Base India Geometric Wireframe */}
+                    <svg viewBox="0 0 100 100" className="w-full h-full max-h-72 opacity-80 filter drop-shadow-[0_0_15px_rgba(0,240,160,0.15)]">
                       <path
                         d="M 38 12 L 48 8 L 54 14 L 46 22 L 56 26 L 68 28 L 74 36 L 86 38 L 82 46 L 72 48 L 68 56 L 62 66 L 52 86 L 46 88 L 44 76 L 36 64 L 28 54 L 20 48 L 22 36 L 30 26 Z"
                         fill="#171E2B"
                         stroke="#00F0A0"
                         strokeWidth="0.8"
                         strokeDasharray="2 1"
-                        className="transition-all"
                       />
-                      {/* Radar sweep circle */}
-                      <circle cx="50" cy="50" r="42" fill="none" stroke="#00D2FF" strokeWidth="0.3" strokeOpacity="0.3" />
-                      <circle cx="50" cy="50" r="28" fill="none" stroke="#00F0A0" strokeWidth="0.3" strokeOpacity="0.3" />
+                      <circle cx="50" cy="50" r="40" fill="none" stroke="#00D2FF" strokeWidth="0.2" strokeOpacity="0.4" />
+                      <circle cx="50" cy="50" r="25" fill="none" stroke="#FF4B4B" strokeWidth="0.2" strokeOpacity="0.4" />
                     </svg>
 
-                    {/* Interactive State Nodal Pins */}
-                    {INDIA_STATES_HEATMAP_DATA.map((st) => {
+                    {/* Interactive State Pins */}
+                    {INDIA_STATES_HEATMAP_DATA.map(st => {
                       const isSelected = st.id === selectedStateId;
                       return (
                         <button
                           key={st.id}
                           onClick={() => setSelectedStateId(st.id)}
                           style={{ left: `${st.coordinates.x}%`, top: `${st.coordinates.y}%` }}
-                          className={`absolute -translate-x-1/2 -translate-y-1/2 p-1 rounded-full transition-all cursor-pointer group z-20 ${
-                            isSelected 
-                              ? 'scale-125 ring-4 ring-[#00F0A0] shadow-[0_0_20px_#00F0A0]' 
-                              : 'hover:scale-110'
+                          className={`absolute -translate-x-1/2 -translate-y-1/2 p-1 cursor-pointer transition-all z-20 ${
+                            isSelected ? 'scale-150 ring-2 ring-[#00F0A0]' : 'hover:scale-125'
                           }`}
-                          title={`${st.state}: ${st.riskIndex}% Threat Index`}
+                          title={`${st.state}: ${st.riskIndex}% Risk`}
                         >
-                          <span className={`w-3 h-3 rounded-full block ${
-                            st.riskIndex >= 90 ? 'bg-[#FF4B4B] animate-pulse' : 'bg-[#00D2FF]'
+                          <span className={`w-2.5 h-2.5 block rounded-full ${
+                            st.riskIndex >= 90 ? 'bg-[#FF4B4B] animate-pulse shadow-[0_0_10px_#FF4B4B]' : 'bg-[#00D2FF]'
                           }`} />
-                          
-                          {/* Hover Tooltip Card */}
-                          <div className="absolute left-1/2 -translate-x-1/2 bottom-5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none bg-[#090C10] border border-white/[0.12] rounded-lg px-2 py-1 text-[10px] font-mono text-white whitespace-nowrap shadow-2xl z-30">
-                            <strong>{st.state}</strong>: {st.riskIndex}% ({st.blockedVolumeCr} Cr)
-                          </div>
                         </button>
                       );
                     })}
                   </div>
 
-                  {/* Bottom Map Legend */}
-                  <div className="flex items-center justify-between text-[10.5px] font-mono text-[#8494A8] border-t border-white/[0.06] pt-2 z-10">
-                    <div className="flex items-center gap-3">
-                      <span className="flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-[#FF4B4B]" /> Critical Zone (&ge;90%)
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-[#00D2FF]" /> High Activity (75-89%)
-                      </span>
-                    </div>
-                    <span className="text-[#00F0A0] font-bold">Selected: {selectedState.state} ({selectedState.id})</span>
+                  {/* Bottom Map Status */}
+                  <div className="p-2 border-t border-white/[0.08] bg-[#171E2B] flex justify-between items-center text-[10px] text-[#e4bdba]">
+                    <span>CURRENT JURISDICTION: <strong className="text-white">{selectedState.state}</strong></span>
+                    <span className="text-[#00F0A0]">NODES: {selectedState.activeThreatNodes.toLocaleString()}</span>
                   </div>
                 </div>
 
-                {/* State Detailed Drilldown Card (5 Cols) */}
-                <div className="xl:col-span-5 p-5 rounded-2xl bg-[#10141C] border border-white/[0.08] flex flex-col justify-between shadow-xl space-y-4">
+                {/* Right 40%: State Dossier Panel */}
+                <div className="w-2/5 bg-[#10141C] border border-white/[0.08] flex flex-col">
                   
-                  {/* Selected State Header */}
-                  <div>
-                    <div className="flex items-start justify-between">
+                  <div className="p-3 border-b border-white/[0.08] bg-[#171E2B] flex flex-col gap-1">
+                    <div className="flex justify-between items-start">
+                      <h2 className="text-base font-bold text-white font-sans">{selectedState.state}</h2>
+                      <div className="text-right">
+                        <div className="text-[9px] text-[#e4bdba] uppercase">Threat Index</div>
+                        <div className="text-2xl text-[#FF4B4B] font-bold leading-none">{selectedState.riskIndex}</div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 mt-1 border-t border-white/[0.08] pt-1 text-xs">
                       <div>
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#00F0A0]/15 text-[#00F0A0] border border-[#00F0A0]/30">
-                            STATE DOSSIER #{selectedState.vulnerabilityRank}
-                          </span>
-                          <span className="text-xs font-mono text-rose-400 font-bold bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/30">
-                            {selectedState.riskIndex}% THREAT INDEX
-                          </span>
-                        </div>
-                        <h2 className="text-xl font-bold text-white font-mono mt-1 flex items-center gap-2">
-                          {selectedState.state} <span className="text-sm text-[#8494A8]">({selectedState.capital})</span>
-                        </h2>
+                        <div className="text-[9px] text-[#e4bdba]">Blocked (24H)</div>
+                        <div className="text-white font-bold">₹{selectedState.blockedVolumeCr} Cr</div>
+                      </div>
+                      <div>
+                        <div className="text-[9px] text-[#e4bdba]">Hotspots</div>
+                        <div className="text-amber-300 text-[10px] truncate">{selectedState.hotspots}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Dense Data Table for PIN Codes */}
+                  <div className="flex-1 overflow-auto flex flex-col">
+                    <div className="px-2.5 py-1.5 bg-[#171E2B] border-b border-white/[0.08] text-[10px] text-[#e4bdba] flex justify-between">
+                      <span>HOT PIN CODES ({selectedState.state})</span>
+                      <span>MULES</span>
+                    </div>
+
+                    <div className="w-full text-[11px]">
+                      <div className="flex w-full bg-[#10141C] border-b border-white/[0.08] text-[#e4bdba] px-2 py-1 text-[10px]">
+                        <div className="w-1/4">PIN</div>
+                        <div className="w-2/4">DISTRICT</div>
+                        <div className="w-1/4 text-right">MULES</div>
                       </div>
 
-                      <span className="text-right">
-                        <span className="text-[10px] font-mono text-[#738294] block">Blocked Volume</span>
-                        <strong className="text-base font-mono text-[#00F0A0]">₹{selectedState.blockedVolumeCr} Cr</strong>
-                      </span>
-                    </div>
-
-                    {/* Modus Operandi Banner */}
-                    <div className="mt-3 p-3 rounded-xl bg-[#090C10] border border-white/[0.06] space-y-1">
-                      <span className="text-[10px] font-mono uppercase text-[#738294] block">Primary Modus Operandi in {selectedState.state}:</span>
-                      <p className="text-xs text-amber-300 font-sans font-medium">
-                        {selectedState.primaryModus}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Hotspot Districts & Targeted Banks */}
-                  <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                    <div className="p-3 rounded-xl bg-[#090C10] border border-white/[0.06] space-y-1">
-                      <span className="text-[10px] text-[#738294]">Hotspot Districts:</span>
-                      <p className="text-white font-bold truncate">{selectedState.hotspots.join(', ')}</p>
-                    </div>
-                    <div className="p-3 rounded-xl bg-[#090C10] border border-white/[0.06] space-y-1">
-                      <span className="text-[10px] text-[#738294]">Active Threat Nodes:</span>
-                      <p className="text-[#00D2FF] font-bold">{selectedState.activeThreatNodes.toLocaleString()} Nodes</p>
-                    </div>
-                  </div>
-
-                  {/* Local PIN Code Micro-Clusters for this Selected State */}
-                  <div className="space-y-2">
-                    <span className="text-[10.5px] font-mono uppercase text-[#8494A8] font-bold block">
-                      Local 6-Digit PIN Code Clusters in {selectedState.state}:
-                    </span>
-                    <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
-                      {selectedState.pinCodes.map((p) => (
-                        <div key={p.pin} className="p-2.5 rounded-xl bg-[#090C10] border border-white/[0.06] hover:border-[#00F0A0]/40 transition-all flex items-center justify-between text-xs font-mono">
-                          <div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-[#00F0A0]">{p.pin}</span>
-                              <span className="text-white font-sans text-xs">({p.city})</span>
-                            </div>
-                            <span className="text-[10px] text-[#738294] block truncate max-w-[200px]">{p.primary}</span>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-xs font-bold text-white block">{p.amount}</span>
-                            <span className="text-[10px] text-rose-400 font-bold">{p.mules} Mules</span>
-                          </div>
+                      {selectedState.pinCodes.map(p => (
+                        <div key={p.pin} className="flex w-full px-2 py-1.5 border-b border-white/[0.04] hover:bg-[#171E2B] text-white cursor-pointer">
+                          <div className="w-1/4 text-[#00F0A0]">{p.pin}</div>
+                          <div className="w-2/4 truncate text-[#e4bdba]">{p.district}</div>
+                          <div className="w-1/4 text-right text-[#FF4B4B] font-bold">{p.mules}</div>
                         </div>
                       ))}
                     </div>
-                  </div>
 
-                  {/* Targeted Branch IFSC Registry */}
-                  <div className="text-[10.5px] font-mono text-[#8494A8] pt-2 border-t border-white/[0.06] flex items-center justify-between">
-                    <span>Flagged IFSC Branches:</span>
-                    <span className="text-white font-bold truncate max-w-[220px]">{selectedState.dominantBranchIFSC}</span>
+                    <div className="p-2 border-t border-white/[0.08] mt-auto">
+                      <div className="text-[9px] text-[#e4bdba] mb-1">FLAGGED IFSC BRANCHES</div>
+                      <div className="flex flex-wrap gap-1">
+                        {selectedState.dominantBranchIFSC.map(ifsc => (
+                          <span key={ifsc} className="px-1.5 py-0.5 bg-[#171E2B] border border-white/[0.08] text-[10px] text-[#00F0A0]">
+                            {ifsc}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
               </div>
 
-              {/* Bottom Telemetry & PIN Code Explorer */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              {/* Bottom Row (3 Columns) */}
+              <div className="h-36 flex gap-2 shrink-0">
                 
-                {/* 6-Digit PIN Code Explorer (6 Cols) */}
-                <div className="md:col-span-6 p-4 rounded-2xl bg-[#10141C] border border-white/[0.08] shadow-md space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-[#00F0A0]" />
-                      National PIN Code Micro-Cluster Search
-                    </span>
-                    <span className="text-[10px] font-mono text-[#738294]">Instant Lookup</span>
+                {/* 5a: Target Locator */}
+                <div className="w-1/4 bg-[#10141C] border border-white/[0.08] p-3 flex flex-col justify-between">
+                  <div>
+                    <div className="text-[11px] text-white flex items-center gap-1.5 font-bold uppercase mb-1">
+                      <Search className="w-3.5 h-3.5 text-[#00F0A0]" />
+                      Target Locator
+                    </div>
+                    <p className="text-[10px] text-[#e4bdba]">Enter 6-digit PIN or IFSC for rapid dossier extraction.</p>
                   </div>
-
                   <div className="relative">
-                    <Search className="w-4 h-4 text-[#738294] absolute left-3 top-2.5" />
+                    <span className="absolute left-2 top-2 text-[#e4bdba] text-xs">&gt;</span>
                     <input
                       type="text"
                       value={pinSearch}
                       onChange={(e) => setPinSearch(e.target.value)}
-                      placeholder="Search 6-digit PIN code (e.g. 815351, 122107, 110001)..."
-                      className="w-full bg-[#090C10] border border-white/[0.1] rounded-xl py-2 pl-9 pr-3 text-xs font-mono text-white placeholder:text-[#546274] focus:outline-none focus:border-[#00F0A0]"
+                      placeholder="PIN / IFSC..."
+                      className="w-full bg-[#171E2B] border border-white/[0.08] text-white text-xs py-1.5 pl-6 pr-2 focus:outline-none focus:border-[#00F0A0]"
                     />
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {[
-                      { pin: '815351', city: 'Jamtara', mules: 1420, risk: 98.6 },
-                      { pin: '122107', city: 'Nuh/Mewat', mules: 2180, risk: 97.9 },
-                      { pin: '321001', city: 'Bharatpur', mules: 1840, risk: 96.4 }
-                    ].map(card => (
-                      <div key={card.pin} className="p-2.5 rounded-xl bg-[#090C10] border border-white/[0.06] space-y-1">
-                        <div className="flex justify-between items-center font-mono text-xs">
-                          <strong className="text-white">{card.pin}</strong>
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#FF4B4B]" />
-                        </div>
-                        <span className="text-[10px] text-[#738294] block truncate">{card.city}</span>
-                        <span className="text-xs font-bold text-rose-400 font-mono block">{card.mules} Mules</span>
-                      </div>
-                    ))}
                   </div>
                 </div>
 
-                {/* Research-Backed Explainable AI & Mathematical Risk Formula (6 Cols) */}
-                <div className="md:col-span-6 p-4 rounded-2xl bg-[#10141C] border border-white/[0.08] shadow-md space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
+                {/* 5b: Explainable AI (XAI) Vector */}
+                <div className="flex-1 bg-[#10141C] border border-white/[0.08] p-3 flex flex-col justify-between">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[11px] text-white flex items-center gap-1.5 font-bold uppercase">
                       <Cpu className="w-3.5 h-3.5 text-[#00D2FF]" />
-                      Auditable Risk Score Fusion (HELF Hybrid Equation)
+                      XAI Risk Vector (HELF Equation)
                     </span>
-                    <span className="text-[10px] font-mono text-[#00F0A0] bg-[#00F0A0]/10 px-2 py-0.5 rounded">
-                      RBI XAI Aligned
-                    </span>
+                    <div className="text-[10px] text-white bg-[#171E2B] px-2 py-0.5 border border-white/[0.08]">
+                      S = 0.70·(0.20·P_LR + 0.45·P_RF + 0.35·P_XGB) + 0.30·A_IF
+                    </div>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-[#090C10] border border-white/[0.06] text-center font-mono text-xs text-[#00D2FF]">
-                    <code>S = 0.70·(0.20·P_LR + 0.45·P_RF + 0.35·P_XGB) + 0.30·A_IF</code>
+                  <div className="space-y-1.5 px-2">
+                    <div className="flex items-center gap-2 text-[10px]">
+                      <span className="w-16 text-right text-[#e4bdba]">VELOCITY</span>
+                      <div className="flex-1 h-2.5 bg-[#171E2B] border border-white/[0.08] relative">
+                        <div className="bg-[#FF4B4B] h-full" style={{ width: '75%' }} />
+                      </div>
+                      <span className="w-10 text-[#FF4B4B] font-bold">+0.42</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-[10px]">
+                      <span className="w-16 text-right text-[#e4bdba]">VPA_TRUST</span>
+                      <div className="flex-1 h-2.5 bg-[#171E2B] border border-white/[0.08] relative">
+                        <div className="bg-[#00F0A0] h-full" style={{ width: '45%' }} />
+                      </div>
+                      <span className="w-10 text-[#00F0A0] font-bold">-0.18</span>
+                    </div>
                   </div>
+                </div>
 
-                  {/* SHAP Feature Contribution Bars */}
-                  <div className="space-y-1.5 text-xs font-mono">
-                    <div className="flex justify-between text-[#8494A8]">
-                      <span>f1: Amount Deviation Z-Score</span>
-                      <strong className="text-rose-400">+0.42 SHAP (32%)</strong>
+                {/* 5c: Real-time Yield ROI */}
+                <div className="w-72 bg-[#10141C] border border-white/[0.08] p-3 flex flex-col justify-between">
+                  <div className="text-[11px] text-[#e4bdba] uppercase font-bold">Real-Time Yield</div>
+                  <div>
+                    <div className="flex justify-between text-[10px] text-[#e4bdba] mb-1">
+                      <span>Interdiction Rate:</span>
+                      <span className="text-white font-bold">98.6%</span>
                     </div>
-                    <div className="w-full h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
-                      <div className="bg-[#FF4B4B] h-full rounded-full" style={{ width: '78%' }} />
-                    </div>
-
-                    <div className="flex justify-between text-[#8494A8]">
-                      <span>f3: Receiver VPA &amp; IFSC Trust</span>
-                      <strong className="text-[#00F0A0]">-0.18 SHAP (24%)</strong>
-                    </div>
-                    <div className="w-full h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
-                      <div className="bg-[#00F0A0] h-full rounded-full" style={{ width: '45%' }} />
+                    <input
+                      type="range"
+                      min="10000"
+                      max="1000000"
+                      step="10000"
+                      value={simulatedTxnVolume}
+                      onChange={(e) => setSimulatedTxnVolume(Number(e.target.value))}
+                      className="w-full accent-[#00F0A0] cursor-pointer h-1 bg-[#171E2B]"
+                    />
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[9px] text-[#e4bdba] uppercase">Est. Citizen Capital Saved</div>
+                    <div className="text-xl font-bold text-[#00EF9F]">
+                      ₹{((simulatedTxnVolume * 365 * 0.0062 * simulatedAvgTicket * 0.986) / 10000000).toFixed(2)} Cr
                     </div>
                   </div>
                 </div>
@@ -823,29 +869,126 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
             </div>
           )}
 
-          {/* ────────────────────────────────────────────────────────
-              VIEW 2: LIVE ROI & FINANCIAL LOSS REDUCTION
-          ──────────────────────────────────────────────────────── */}
-          {activeTab === 'statistics_impact' && (
-            <div className="p-5 rounded-2xl bg-[#10141C] border border-white/[0.08] space-y-5 shadow-xl animate-fade-in">
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-                <div>
-                  <h2 className="text-base font-bold text-white font-mono flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-[#00F0A0]" />
-                    Financial Fraud Loss Reduction &amp; Bank ROI Calculator
-                  </h2>
-                  <p className="text-xs text-[#8494A8] font-mono mt-0.5">
-                    Empirical validation of pre-authorization interception vs post-authorization chargeback losses.
-                  </p>
+          {/* ══════════════════════════════════════════════════════════════
+              TAB 2: THREAT REGISTRY DATABASE (FULL SEARCH TABLE)
+          ══════════════════════════════════════════════════════════════ */}
+          {activeTab === 'database_search' && (
+            <div className="flex-1 bg-[#10141C] border border-white/[0.08] p-4 flex flex-col gap-3 overflow-hidden">
+              <div className="flex justify-between items-center border-b border-white/[0.08] pb-3">
+                <div className="flex items-center gap-2">
+                  <Database className="w-5 h-5 text-[#00F0A0]" />
+                  <h2 className="text-sm font-bold text-white uppercase">National Threat Registry Database ({threats.length.toLocaleString()} Records)</h2>
                 </div>
+                <button
+                  onClick={() => setShowAddThreatModal(true)}
+                  className="px-3 py-1.5 bg-[#00F0A0] text-black font-bold text-xs uppercase cursor-pointer"
+                >
+                  + Add Record
+                </button>
               </div>
 
-              {/* Sliders */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-[#090C10] border border-white/[0.06]">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs font-mono">
-                    <span className="text-[#8494A8]">Daily Bank UPI Transaction Volume:</span>
-                    <strong className="text-[#00F0A0]">{simulatedTxnVolume.toLocaleString()} txns/day</strong>
+              <div className="relative">
+                <Search className="w-4 h-4 text-[#e4bdba] absolute left-3 top-2.5" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Filter by VPA, Phone, or IFSC..."
+                  className="w-full bg-[#171E2B] border border-white/[0.08] py-2 pl-9 pr-3 text-xs text-white focus:outline-none focus:border-[#00F0A0]"
+                />
+              </div>
+
+              <div className="flex-1 overflow-y-auto border border-white/[0.08]">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-[#171E2B] text-[#e4bdba] uppercase text-[10px] sticky top-0">
+                    <tr>
+                      <th className="p-2.5">Identifier</th>
+                      <th className="p-2.5">Type</th>
+                      <th className="p-2.5">Category</th>
+                      <th className="p-2.5">Risk</th>
+                      <th className="p-2.5">Source</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {threats
+                      .filter(t => !searchQuery || t.identifier?.toLowerCase().includes(searchQuery.toLowerCase()))
+                      .slice(0, 50)
+                      .map((t, idx) => (
+                        <tr key={idx} className="border-b border-white/[0.04] hover:bg-[#171E2B] text-white">
+                          <td className="p-2.5 font-bold text-[#00F0A0]">{t.identifier}</td>
+                          <td className="p-2.5">{t.type}</td>
+                          <td className="p-2.5 text-[#e4bdba]">{t.category}</td>
+                          <td className="p-2.5 text-[#FF4B4B] font-bold">{t.riskScore || 95}%</td>
+                          <td className="p-2.5 text-[10px] text-[#e4bdba] truncate max-w-xs">{t.source || 'I4C Distributed Feed'}</td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════════════════════════════
+              TAB 3: APPEALS REVIEW QUEUE
+          ══════════════════════════════════════════════════════════════ */}
+          {activeTab === 'disputes' && (
+            <div className="flex-1 bg-[#10141C] border border-white/[0.08] p-4 flex flex-col gap-3 overflow-hidden">
+              <div className="flex justify-between items-center border-b border-white/[0.08] pb-3">
+                <h2 className="text-sm font-bold text-white uppercase flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-amber-400" />
+                  False-Positive Appeals Review Desk ({appeals.length} Tickets)
+                </h2>
+              </div>
+
+              <div className="flex-1 overflow-y-auto space-y-2">
+                {appeals.length === 0 ? (
+                  <div className="p-8 text-center text-[#e4bdba] bg-[#171E2B] border border-white/[0.08]">
+                    No pending appeals in queue. All false-positive reviews are clear.
+                  </div>
+                ) : (
+                  appeals.map(a => (
+                    <div key={a.appealId || a.ticketId} className="p-3 bg-[#171E2B] border border-white/[0.08] flex items-center justify-between text-xs">
+                      <div>
+                        <div className="text-[#00F0A0] font-bold">{a.appealId || a.ticketId}</div>
+                        <div className="text-white">VPA: {a.vpa} • ₹{a.amount}</div>
+                        <div className="text-[10px] text-[#e4bdba]">{a.reason || 'Merchant account incorrectly flagged'}</div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleResolveAppeal(a.appealId || a.ticketId, 'APPROVED')}
+                          className="px-3 py-1 bg-[#00F0A0] text-black font-bold uppercase text-[11px] cursor-pointer"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleResolveAppeal(a.appealId || a.ticketId, 'REJECTED')}
+                          className="px-3 py-1 bg-[#FF4B4B] text-white font-bold uppercase text-[11px] cursor-pointer"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════════════════════════════
+              TAB 4: ROI & LOSS REDUCTION TELEMETRY
+          ══════════════════════════════════════════════════════════════ */}
+          {activeTab === 'statistics_impact' && (
+            <div className="flex-1 bg-[#10141C] border border-white/[0.08] p-5 flex flex-col gap-4 overflow-y-auto">
+              <h2 className="text-sm font-bold text-white uppercase flex items-center gap-2 border-b border-white/[0.08] pb-3">
+                <BarChart3 className="w-4 h-4 text-[#00F0A0]" />
+                Financial Loss Reduction &amp; Bank ROI Analytics
+              </h2>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-[#171E2B] border border-white/[0.08] space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-[#e4bdba]">Daily UPI Txn Volume:</span>
+                    <strong className="text-[#00F0A0]">{simulatedTxnVolume.toLocaleString()}</strong>
                   </div>
                   <input
                     type="range"
@@ -858,9 +1001,9 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs font-mono">
-                    <span className="text-[#8494A8]">Average Ticket Size:</span>
+                <div className="p-4 bg-[#171E2B] border border-white/[0.08] space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-[#e4bdba]">Avg Ticket Size:</span>
                     <strong className="text-[#00F0A0]">₹{simulatedAvgTicket.toLocaleString()}</strong>
                   </div>
                   <input
@@ -875,259 +1018,255 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl bg-[#00F0A0]/10 border border-[#00F0A0]/30 flex items-center justify-between">
+              <div className="p-4 bg-[#00F0A0]/10 border border-[#00F0A0] flex justify-between items-center">
                 <div>
-                  <span className="text-xs font-mono text-[#8494A8] block">Projected Annual Savings with VERIX:</span>
-                  <strong className="text-2xl font-bold font-mono text-[#00F0A0]">
+                  <span className="text-xs text-[#e4bdba] block">Projected Annual Savings with VERIX:</span>
+                  <strong className="text-3xl font-bold text-[#00F0A0]">
                     ₹{((simulatedTxnVolume * 365 * 0.0062 * simulatedAvgTicket * 0.986) / 10000000).toFixed(2)} Cr
                   </strong>
                 </div>
-                <span className="text-xs font-mono text-[#00F0A0] bg-[#00F0A0]/15 px-3 py-1.5 rounded-xl border border-[#00F0A0]/30 font-bold">
-                  98.6% Fraud Mitigated
+                <span className="text-xs bg-[#00F0A0] text-black px-3 py-1 font-bold">
+                  98.6% MITIGATION RATE
                 </span>
               </div>
             </div>
           )}
 
-          {/* ────────────────────────────────────────────────────────
-              VIEW 3: APPEALS QUEUE
-          ──────────────────────────────────────────────────────── */}
-          {activeTab === 'disputes' && (
-            <div className="p-5 rounded-2xl bg-[#10141C] border border-white/[0.08] space-y-4 shadow-xl">
-              <h2 className="text-sm font-bold text-white font-mono flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[#00F0A0]" />
-                False-Positive Appeals Review Desk
+          {/* ══════════════════════════════════════════════════════════════
+              TAB 5: VOICE PHISHING LAB
+          ══════════════════════════════════════════════════════════════ */}
+          {activeTab === 'audio_lab' && (
+            <div className="flex-1 bg-[#10141C] border border-white/[0.08] p-5 flex flex-col gap-4 overflow-y-auto">
+              <h2 className="text-sm font-bold text-white uppercase flex items-center gap-2 border-b border-white/[0.08] pb-3">
+                <Mic className="w-4 h-4 text-purple-400" />
+                Live Voice Phishing &amp; Linguistic Deception Teleprompter
               </h2>
-              <div className="space-y-2">
-                {appeals.length === 0 ? (
-                  <p className="text-xs font-mono text-[#738294] p-4 bg-[#090C10] rounded-xl text-center">Queue is clean. No pending appeals.</p>
-                ) : (
-                  appeals.map(a => (
-                    <div key={a.appealId || a.ticketId} className="p-3 bg-[#090C10] rounded-xl border border-white/[0.06] flex items-center justify-between text-xs font-mono">
-                      <span>{a.appealId || a.ticketId} • {a.vpa} • ₹{a.amount}</span>
-                      <button onClick={() => setSelectedTicket(a)} className="px-3 py-1 bg-[#171E2B] text-[#00F0A0] rounded-lg">Inspect</button>
-                    </div>
-                  ))
-                )}
+
+              <div className="p-4 bg-[#171E2B] border border-white/[0.08] space-y-2">
+                <span className="text-xs text-purple-300 font-bold uppercase">Groq Whisper Large v3 Transcription Stream:</span>
+                <p className="text-xs text-white leading-relaxed p-3 bg-black border border-white/[0.08]">
+                  "This is <span className="text-[#FF4B4B] font-bold">[Mumbai Police Cyber Crime Cell]</span>. An arrest warrant has been issued under <span className="text-[#FF4B4B] font-bold">[Section 41A CrPC]</span>. Transfer <span className="text-[#FF4B4B] font-bold">[₹25,000 security bail deposit]</span> immediately."
+                </p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="p-3 bg-[#171E2B] border border-white/[0.08]">
+                  <span className="text-[10px] text-[#e4bdba]">COERCION PROBABILITY</span>
+                  <div className="text-xl font-bold text-[#FF4B4B]">95.4%</div>
+                </div>
+                <div className="p-3 bg-[#171E2B] border border-white/[0.08]">
+                  <span className="text-[10px] text-[#e4bdba]">DETECTED DIALECT</span>
+                  <div className="text-xl font-bold text-[#00F0A0]">BHOJPURI-HINDI</div>
+                </div>
+                <div className="p-3 bg-[#171E2B] border border-white/[0.08]">
+                  <span className="text-[10px] text-[#e4bdba]">VOIP HOP COUNT</span>
+                  <div className="text-xl font-bold text-cyan-300">4 PROXIES</div>
+                </div>
               </div>
             </div>
           )}
 
-          {/* ────────────────────────────────────────────────────────
-              VIEW 4: THREAT REGISTRY DATABASE
-          ──────────────────────────────────────────────────────── */}
-          {activeTab === 'database_search' && (
-            <div className="p-5 rounded-2xl bg-[#10141C] border border-white/[0.08] space-y-4 shadow-xl">
-              <div className="flex justify-between items-center">
-                <h2 className="text-sm font-bold text-white font-mono flex items-center gap-2">
-                  <Database className="w-4 h-4 text-[#00F0A0]" />
-                  National Blacklisted Threats ({threats.length.toLocaleString()} Records)
-                </h2>
-                <button onClick={() => setShowAddThreatModal(true)} className="px-3 py-1 bg-[#00F0A0] text-[#080B0F] font-bold text-xs rounded-lg">+ Add</button>
+          {/* ══════════════════════════════════════════════════════════════
+              TAB 6: SIM SWAP & IMSI MONITOR
+          ══════════════════════════════════════════════════════════════ */}
+          {activeTab === 'sim_carrier' && (
+            <div className="flex-1 bg-[#10141C] border border-white/[0.08] p-5 flex flex-col gap-4 overflow-y-auto">
+              <h2 className="text-sm font-bold text-white uppercase flex items-center gap-2 border-b border-white/[0.08] pb-3">
+                <Radio className="w-4 h-4 text-blue-400" />
+                Telecom SIM Swap &amp; IMSI Anomaly Tracker
+              </h2>
+
+              <div className="p-4 bg-[#171E2B] border border-white/[0.08] space-y-2">
+                <span className="text-xs text-[#00F0A0] font-bold uppercase">Active Carrier Feed: Airtel, Jio, Vi</span>
+                <p className="text-xs text-[#e4bdba]">
+                  Monitors real-time SIM card replacements and IMSI resets within the last 48 hours to block SMS OTP hijacking.
+                </p>
               </div>
-              <div className="space-y-1.5 max-h-[480px] overflow-y-auto">
-                {threats.slice(0, 30).map((t, idx) => (
-                  <div key={idx} className="p-2.5 bg-[#090C10] rounded-xl border border-white/[0.06] flex items-center justify-between text-xs font-mono">
-                    <span className="text-white font-bold">{t.identifier} ({t.type})</span>
-                    <span className="text-rose-400 font-bold">{t.riskScore || 95}%</span>
-                  </div>
-                ))}
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════════════════════════════
+              TAB 7: I4C NATIONAL ADVISORIES
+          ══════════════════════════════════════════════════════════════ */}
+          {activeTab === 'advisories' && (
+            <div className="flex-1 bg-[#10141C] border border-white/[0.08] p-5 flex flex-col gap-4 overflow-y-auto">
+              <h2 className="text-sm font-bold text-white uppercase flex items-center gap-2 border-b border-white/[0.08] pb-3">
+                <BellRing className="w-4 h-4 text-amber-400" />
+                I4C &amp; RBI National Security Advisories (2026)
+              </h2>
+
+              <div className="space-y-2 text-xs">
+                <div className="p-3 bg-[#171E2B] border border-white/[0.08]">
+                  <strong className="text-white">ADV-2026-08:</strong> Coercive Digital Arrest Video Calls impersonating CBI &amp; Mumbai Police.
+                </div>
+                <div className="p-3 bg-[#171E2B] border border-white/[0.08]">
+                  <strong className="text-white">ADV-2026-04:</strong> Fake Electricity Bill Power-Cut APKs sent via WhatsApp.
+                </div>
               </div>
             </div>
           )}
 
         </main>
 
-        {/* ══════════════════════════════════════════════════════════════
-            RIGHT INSPECTOR PANEL (Sentinel Engine, Threat HUD & Audio)
-        ══════════════════════════════════════════════════════════════ */}
-        <aside className="w-full xl:w-80 shrink-0 flex flex-col gap-4">
+        {/* ── RIGHT INSPECTOR PANEL (W-80 DOCKED) ── */}
+        <aside className="fixed right-0 top-16 h-[calc(100vh-64px)] w-80 bg-[#10141C] border-l border-white/[0.08] flex flex-col z-40">
           
-          {/* Transfer Mode Selector */}
-          <div className="p-1 bg-[#10141C] border border-white/[0.08] rounded-2xl flex shadow-md">
+          {/* Dual Tabs */}
+          <div className="flex w-full border-b border-white/[0.08] bg-[#171E2B]">
             <button
               onClick={() => setInspectorMode('UPI')}
-              className={`flex-1 py-2 text-xs font-mono font-bold rounded-xl transition-all cursor-pointer ${
-                inspectorMode === 'UPI' ? 'bg-[#00F0A0] text-[#080B0F] shadow-[0_0_10px_rgba(0,240,160,0.3)]' : 'text-[#8494A8] hover:text-white'
+              className={`flex-1 py-2 text-[11px] uppercase text-center font-bold transition-all cursor-pointer ${
+                inspectorMode === 'UPI' ? 'bg-[#10141C] text-[#FF4B4B] border-b-2 border-[#FF4B4B]' : 'text-[#e4bdba] hover:bg-[#10141C]'
               }`}
             >
-              ⚡ UPI ID / QR
+              ⚡ UPI Stream
             </button>
             <button
               onClick={() => setInspectorMode('BANK')}
-              className={`flex-1 py-2 text-xs font-mono font-bold rounded-xl transition-all cursor-pointer ${
-                inspectorMode === 'BANK' ? 'bg-[#00F0A0] text-[#080B0F] shadow-[0_0_10px_rgba(0,240,160,0.3)]' : 'text-[#8494A8] hover:text-white'
+              className={`flex-1 py-2 text-[11px] uppercase text-center font-bold transition-all cursor-pointer ${
+                inspectorMode === 'BANK' ? 'bg-[#10141C] text-[#00F0A0] border-b-2 border-[#00F0A0]' : 'text-[#e4bdba] hover:bg-[#10141C]'
               }`}
             >
               🏦 Bank A/C + IFSC
             </button>
           </div>
 
-          {/* High-Voltage 95% Threat Interception HUD */}
-          <div className="p-4 rounded-2xl bg-[#10141C] border border-[#FF4B4B]/40 shadow-[0_0_20px_rgba(255,75,75,0.15)] relative overflow-hidden space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#FF4B4B]/10 border border-[#FF4B4B]/30 flex items-center justify-center text-[#FF4B4B] shrink-0">
-                <ShieldAlert className="w-6 h-6 animate-pulse" />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono text-[#FF4B4B] uppercase font-bold tracking-wider">High-Voltage Intercept</span>
-                <h3 className="text-sm font-bold text-white font-mono">95% CRITICAL THREAT</h3>
+          <div className="p-3 flex-1 overflow-y-auto flex flex-col gap-4">
+            
+            {/* Interception Card */}
+            <div className="bg-[#10141C] border border-[#FF4B4B] relative">
+              <div className="absolute top-0 left-0 w-1 h-full bg-[#FF4B4B]" />
+              <div className="p-3 pl-4 flex flex-col gap-2">
+                <div className="flex justify-between items-start">
+                  <span className="px-1.5 py-0.5 bg-[#FF4B4B]/20 text-[#FF4B4B] text-[10px] border border-[#FF4B4B]/50 uppercase font-bold">
+                    95% CRITICAL
+                  </span>
+                  <span className="text-[10px] text-[#e4bdba]">T-MINUS 12s</span>
+                </div>
+
+                <div className="text-[12px] text-white break-all space-y-0.5 font-mono">
+                  {inspectorMode === 'UPI' ? (
+                    <>
+                      <div>vpa: <span className="text-[#FF4B4B] font-bold">{inspectorVpa}</span></div>
+                      <div>amt: ₹ 4,50,000</div>
+                      <div>dev: REDMI_NOTE_12_MULE</div>
+                    </>
+                  ) : (
+                    <>
+                      <div>acc: <span className="text-[#00F0A0] font-bold">{inspectorAcc}</span></div>
+                      <div>ifsc: <span className="text-[#00F0A0] font-bold">{inspectorIfsc}</span></div>
+                      <div>branch: SBI Jamtara Sadar</div>
+                    </>
+                  )}
+                </div>
+
+                <div className="mt-1">
+                  <span className="inline-block px-2 py-0.5 bg-[#171E2B] border border-white/[0.08] text-white text-[10px] uppercase font-bold">
+                    TAG: DIGITAL ARREST
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-[#090C10] border border-[#FF4B4B]/20 space-y-1">
-              <span className="text-[10px] font-mono uppercase text-[#738294] block">Modus Operandi:</span>
-              <span className="text-xs font-mono font-bold text-[#FF4B4B] block">
-                &gt; DIGITAL ARREST (POLICE COERCION)
-              </span>
-            </div>
-
-            <div className="flex gap-2">
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-2">
               <button
                 onClick={() => {
-                  setActionSuccess(`VPA ${inspectorVpa} hard-blocked across National Registry.`);
+                  setActionSuccess(`VPA ${inspectorVpa} permanently blacklisted across all Indian UPI gateways.`);
                   setTimeout(() => setActionSuccess(''), 3000);
                 }}
-                className="flex-1 py-2 rounded-xl bg-[#FF4B4B] hover:bg-rose-600 text-white font-mono text-xs font-bold transition-all cursor-pointer shadow-md"
+                className="w-full py-2 bg-transparent border border-[#FF4B4B] text-[#FF4B4B] text-xs uppercase hover:bg-[#FF4B4B] hover:text-black font-bold transition-all cursor-pointer"
               >
-                BLOCK VPA
+                BLOCK VPA INSTANTLY
               </button>
+
               <button
                 onClick={() => {
-                  setActionSuccess(`1930 Cybercrime Dossier dispatched to I4C portal.`);
+                  setActionSuccess('1930 National Cybercrime Dossier dispatched to I4C Incident Portal.');
                   setTimeout(() => setActionSuccess(''), 3000);
                 }}
-                className="flex-1 py-2 rounded-xl bg-[#171E2B] hover:bg-[#1E2636] border border-white/[0.1] text-xs font-mono text-white transition-all cursor-pointer"
+                className="w-full py-2 bg-[#171E2B] border border-white/[0.08] text-white text-xs uppercase hover:bg-white/[0.08] font-bold transition-all cursor-pointer"
               >
-                1930 DOSSIER
+                COMPILE 1930 DOSSIER
               </button>
             </div>
-          </div>
 
-          {/* Voice Phishing Equalizer Wave & Regional Audio Controls */}
-          <div className="p-4 rounded-2xl bg-[#10141C] border border-white/[0.08] shadow-xl space-y-3 flex-1 flex flex-col justify-between">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
-                <Volume2 className="w-3.5 h-3.5 text-purple-400" />
-                Regional Audio Sentinel
-              </span>
-              <span className="text-[10px] font-mono text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded">
-                ElevenLabs LPU
-              </span>
-            </div>
+            <div className="h-px w-full bg-white/[0.08]" />
 
-            {/* Audio Wave Visualizer Simulation */}
-            <div className="h-12 flex items-end justify-between gap-1 px-2 py-1 bg-[#090C10] rounded-xl border border-white/[0.04]">
-              <div className="w-1.5 bg-[#00F0A0] rounded-t-sm h-[40%] animate-pulse" />
-              <div className="w-1.5 bg-[#00D2FF] rounded-t-sm h-[75%] animate-pulse" />
-              <div className="w-1.5 bg-[#00F0A0] rounded-t-sm h-[50%] animate-pulse" />
-              <div className="w-1.5 bg-purple-400 rounded-t-sm h-[90%] animate-pulse" />
-              <div className="w-1.5 bg-[#FF4B4B] rounded-t-sm h-[65%] animate-pulse" />
-              <div className="w-1.5 bg-[#00D2FF] rounded-t-sm h-[80%] animate-pulse" />
-              <div className="w-1.5 bg-[#00F0A0] rounded-t-sm h-[45%] animate-pulse" />
-              <div className="w-1.5 bg-purple-400 rounded-t-sm h-[70%] animate-pulse" />
-            </div>
+            {/* Audio Forensics Module */}
+            <div className="flex flex-col gap-2 mt-auto pb-2">
+              <div className="text-[11px] text-[#e4bdba] flex items-center gap-1.5 uppercase font-bold">
+                <Volume2 className="w-4 h-4 text-purple-400" />
+                Audio Forensics Sync
+              </div>
 
-            {/* 6 Regional Language Pill Triggers */}
-            <div className="space-y-1">
-              <span className="text-[10px] font-mono text-[#738294] block">Play Regional Warning Voice:</span>
-              <div className="grid grid-cols-3 gap-1.5">
-                {[
-                  { lang: 'hi', label: 'Hindi (HI)' },
-                  { lang: 'bn', label: 'Bengali (BN)' },
-                  { lang: 'or', label: 'Odia (OR)' },
-                  { lang: 'te', label: 'Telugu (TE)' },
-                  { lang: 'ta', label: 'Tamil (TA)' },
-                  { lang: 'en', label: 'English (EN)' }
-                ].map(item => (
-                  <button
-                    key={item.lang}
-                    onClick={() => playRegionalVoiceWarning('upi', item.lang)}
-                    className="py-1 px-1.5 rounded-lg bg-[#090C10] hover:bg-[#00F0A0]/20 border border-white/[0.08] hover:border-[#00F0A0]/40 text-[10px] font-mono text-white transition-all cursor-pointer text-center"
-                  >
-                    {item.label}
-                  </button>
-                ))}
+              {/* Simulated Waveform */}
+              <div className="h-14 w-full bg-[#171E2B] border border-white/[0.08] flex items-center justify-center p-2">
+                <div className="flex items-end gap-[3px] h-full w-full opacity-80">
+                  <div className="w-1.5 bg-[#e4bdba] h-[20%]" />
+                  <div className="w-1.5 bg-[#e4bdba] h-[40%]" />
+                  <div className="w-1.5 bg-[#00F0A0] h-[80%] animate-pulse" />
+                  <div className="w-1.5 bg-[#e4bdba] h-[30%]" />
+                  <div className="w-1.5 bg-[#FF4B4B] h-[90%] animate-pulse" />
+                  <div className="w-1.5 bg-[#00D2FF] h-[100%] animate-pulse" />
+                  <div className="w-1.5 bg-[#e4bdba] h-[50%]" />
+                  <div className="w-1.5 bg-[#00F0A0] h-[70%]" />
+                  <div className="w-1.5 bg-[#FF4B4B] h-[60%]" />
+                </div>
+              </div>
+
+              {/* 6 Regional Language Audio Triggers */}
+              <div className="space-y-1 mt-1">
+                <span className="text-[10px] text-[#e4bdba]">Play Regional Audio Warning:</span>
+                <div className="grid grid-cols-3 gap-1">
+                  {[
+                    { lang: 'hi', label: 'HI (Hindi)' },
+                    { lang: 'bn', label: 'BN (Bengali)' },
+                    { lang: 'or', label: 'OR (Odia)' },
+                    { lang: 'te', label: 'TE (Telugu)' },
+                    { lang: 'ta', label: 'TA (Tamil)' },
+                    { lang: 'en', label: 'EN (English)' }
+                  ].map(item => (
+                    <button
+                      key={item.lang}
+                      onClick={() => playRegionalVoiceWarning('upi', item.lang)}
+                      className="py-1 px-1 bg-[#171E2B] hover:bg-[#00F0A0] hover:text-black border border-white/[0.08] text-[10px] text-white transition-all cursor-pointer text-center font-bold"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
 
+          </div>
         </aside>
 
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════
-          MODAL: OFFICER PROFILE & JURISDICTION SETUP
-      ══════════════════════════════════════════════════════════════ */}
-      {showProfileModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md bg-[#10141C] border border-white/[0.12] rounded-2xl p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-[#00F0A0]" />
-                <h3 className="text-sm font-bold text-white font-mono">Officer Profile &amp; Station Jurisdiction</h3>
-              </div>
-              <button onClick={() => setShowProfileModal(false)} className="p-1 rounded-lg text-[#8494A8] hover:text-white">
-                <XCircle className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs font-mono">
-              <div className="p-3 bg-[#090C10] rounded-xl border border-white/[0.06] space-y-1">
-                <span className="text-[10px] text-[#738294]">Officer Name &amp; Rank:</span>
-                <p className="text-white font-bold">{officerProfile.name}</p>
-              </div>
-
-              <div className="p-3 bg-[#090C10] rounded-xl border border-white/[0.06] space-y-1">
-                <span className="text-[10px] text-[#738294]">Banking / Law Enforcement Entity:</span>
-                <p className="text-[#00D2FF] font-bold">{officerProfile.bankName}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div className="p-3 bg-[#090C10] rounded-xl border border-white/[0.06] space-y-1">
-                  <span className="text-[10px] text-[#738294]">PIN Code:</span>
-                  <p className="text-[#00F0A0] font-bold">{officerProfile.postalCode}</p>
-                </div>
-                <div className="p-3 bg-[#090C10] rounded-xl border border-white/[0.06] space-y-1">
-                  <span className="text-[10px] text-[#738294]">Station Node:</span>
-                  <p className="text-white font-bold">{officerProfile.stationCode}</p>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setShowProfileModal(false)}
-              className="w-full py-2.5 rounded-xl bg-[#00F0A0] text-[#080B0F] font-bold font-mono text-xs cursor-pointer shadow-md"
-            >
-              Done
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════
-          MODAL: ADD NEW THREAT RECORD
-      ══════════════════════════════════════════════════════════════ */}
+      {/* ── MODAL: ADD RECORD ── */}
       {showAddThreatModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <form onSubmit={handleAddNewThreat} className="w-full max-w-md bg-[#10141C] border border-white/[0.12] rounded-2xl p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
-              <h3 className="text-sm font-bold text-white font-mono flex items-center gap-2">
-                <PlusCircle className="w-4 h-4 text-[#00F0A0]" /> Add Threat to Registry
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-fade-in">
+          <form onSubmit={handleAddNewThreat} className="w-full max-w-md bg-[#10141C] border border-white/[0.12] p-6 space-y-4 shadow-2xl">
+            <div className="flex justify-between items-center border-b border-white/[0.08] pb-3">
+              <h3 className="text-sm font-bold text-white uppercase flex items-center gap-2">
+                <PlusCircle className="w-4 h-4 text-[#00F0A0]" /> Add Blacklist Record
               </h3>
-              <button type="button" onClick={() => setShowAddThreatModal(false)} className="text-[#8494A8] hover:text-white">
+              <button type="button" onClick={() => setShowAddThreatModal(false)} className="text-[#e4bdba] hover:text-white">
                 <XCircle className="w-5 h-5" />
               </button>
             </div>
             <input
               type="text"
+              required
               value={newThreatIdentifier}
               onChange={(e) => setNewThreatIdentifier(e.target.value)}
-              placeholder="UPI VPA or Phone (+91)..."
-              className="w-full bg-[#090C10] border border-white/[0.1] rounded-xl py-2 px-3 text-xs font-mono text-white focus:outline-none focus:border-[#00F0A0]"
-              required
+              placeholder="UPI ID, Phone (+91), or Bank A/C..."
+              className="w-full bg-[#171E2B] border border-white/[0.08] p-2.5 text-xs text-white focus:outline-none focus:border-[#00F0A0]"
             />
-            <button type="submit" className="w-full py-2.5 bg-[#00F0A0] text-[#080B0F] font-bold font-mono text-xs rounded-xl">Save</button>
+            <button type="submit" className="w-full py-2.5 bg-[#00F0A0] text-black font-bold text-xs uppercase cursor-pointer">
+              Save to Registry
+            </button>
           </form>
         </div>
       )}
