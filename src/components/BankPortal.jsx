@@ -7,7 +7,7 @@ import {
   Radio, BellRing, FileAudio, Upload, Mic, Play, Square, FileText, ChevronRight,
   ExternalLink, Eye, PlusCircle, AlertCircle, History, Trash2, Archive, RotateCcw,
   Download, Copy, ChevronLeft, ChevronsLeft, ChevronsRight, X, Layers,
-  Globe, BarChart3, Activity, Gauge, Map, Sliders, Cpu, GitBranch, Target, Zap,
+  Globe, BarChart3, Activity, Gauge, Sliders, Cpu, GitBranch, Target, Zap,
   DollarSign, Crosshair, Award, CheckSquare, ChevronDown, PieChart, Volume2, Satellite
 } from 'lucide-react';
 import { INITIAL_THREAT_RECORDS } from '../threatData.js';

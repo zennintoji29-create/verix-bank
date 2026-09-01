@@ -834,26 +834,20 @@ export default function UpiCheckScreen({ onBack, backendUrl, user, initialPreset
         </button>
         <h2 className="text-[14px] font-bold text-[#F5F6FA] font-mono">Pre-Payment Sentinel</h2>
         
-        {/* Hidden Direct Gallery File Input for Android WebView */}
-        <input 
-          type="file" 
-          id="direct-gallery-qr-input"
-          ref={directGalleryRef} 
-          accept="image/*" 
-          onChange={handleDirectGalleryUpload} 
-          style={{ position: 'absolute', opacity: 0, width: '1px', height: '1px', pointerEvents: 'none', zIndex: -1 }}
-        />
-
+        {/* Direct Full-Coverage Gallery File Input for 100% Android WebView Compatibility */}
         <div className="flex items-center gap-1.5">
-          <label
-            htmlFor="direct-gallery-qr-input"
-            onClick={() => directGalleryRef.current?.click()}
-            title="Upload QR Image from Gallery"
-            className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full border border-[#262B3A] text-[#F5F6FA] bg-[#151823] active:scale-90 transition-all cursor-pointer hover:bg-[#1C202E]"
-          >
-            {decodingGallery ? <RefreshCw className="w-3.5 h-3.5 text-[#3ECF7A] animate-spin" /> : <Upload className="w-3.5 h-3.5 text-[#3ECF7A] stroke-[2.5]" />}
-            <span className="hidden sm:inline">Upload QR</span>
-          </label>
+          <div className="relative overflow-hidden flex items-center">
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleDirectGalleryUpload} 
+              className="absolute inset-0 w-full h-full opacity-0 z-30 cursor-pointer"
+            />
+            <div className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full border border-[#262B3A] text-[#F5F6FA] bg-[#151823] pointer-events-none hover:bg-[#1C202E]">
+              {decodingGallery ? <RefreshCw className="w-3.5 h-3.5 text-[#3ECF7A] animate-spin" /> : <Upload className="w-3.5 h-3.5 text-[#3ECF7A] stroke-[2.5]" />}
+              <span className="hidden sm:inline">Upload QR</span>
+            </div>
+          </div>
           <button
             onClick={() => setShowQrModal(true)}
             title="Scan QR Code"
