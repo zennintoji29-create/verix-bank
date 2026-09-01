@@ -148,35 +148,34 @@ const INDIA_STATES_HEATMAP_DATA = [
     activeThreatNodes: 2110,
     blockedVolumeCr: '17.30',
     primaryModus: 'Telegram Review/Rating Tasks & Crypto Arbitrage Scams',
-    topMuleBanks: ['Canara Bank', 'Kotak Mahindra', 'State Bank of India'],
-    dominantBranchIFSC: ['CNRB0000001', 'KKBK0000421', 'SBIN0000813'],
+    topMuleBanks: ['Canara Bank', 'Axis Bank', 'State Bank of India'],
+    dominantBranchIFSC: ['CNRB0000214', 'UTIB0000122', 'SBIN0040012'],
     severity: 'HIGH',
     vulnerabilityRank: '#7',
     coordinates: { x: 42, y: 72 },
     pinCodes: [
-      { pin: '560001', district: 'Bengaluru GPO', mules: 620, blocked: '₹7.90 Cr', type: 'TELEGRAM_TASK' },
-      { pin: '560034', district: 'Koramangala', mules: 510, blocked: '₹5.60 Cr', type: 'CRYPTO_OTC' },
-      { pin: '570001', district: 'Mysuru Urban', mules: 380, blocked: '₹3.80 Cr', type: 'HOTEL_TASK' }
+      { pin: '560034', district: 'Koramangala', mules: 540, blocked: '₹9.40 Cr', type: 'TELEGRAM_TASK' },
+      { pin: '560066', district: 'Whitefield', mules: 410, blocked: '₹5.10 Cr', type: 'CRYPTO_BOT' },
+      { pin: '570001', district: 'Mysuru City', mules: 290, blocked: '₹2.80 Cr', type: 'WORK_FROM_HOME' }
     ]
   },
   {
     id: 'GJ',
     state: 'GUJARAT',
     capital: 'Gandhinagar',
-    hotspots: 'Surat, Ahmedabad Maninagar, Rajkot',
+    hotspots: 'Surat, Ahmedabad, Rajkot',
     riskIndex: 87.2,
-    activeThreatNodes: 1980,
-    blockedVolumeCr: '15.80',
-    primaryModus: 'Layered Current Account Mules & Hawala UPI Integration',
-    topMuleBanks: ['ICICI Bank', 'Axis Bank', 'Bank of Baroda'],
-    dominantBranchIFSC: ['BARB0MANINA', 'ICIC0000045', 'UTIB0000112'],
+    activeThreatNodes: 2240,
+    blockedVolumeCr: '15.10',
+    primaryModus: 'Dabba Trading, Commodity Forex & Fake IPO Schemes',
+    topMuleBanks: ['Bank of Baroda', 'ICICI Bank', 'Kotak Mahindra'],
+    dominantBranchIFSC: ['BARB0SURATX', 'ICIC0000188', 'KKBK0000841'],
     severity: 'HIGH',
     vulnerabilityRank: '#8',
-    coordinates: { x: 23, y: 47 },
+    coordinates: { x: 26, y: 46 },
     pinCodes: [
-      { pin: '380008', district: 'Maninagar', mules: 540, blocked: '₹9.40 Cr', type: 'HAWALA' },
-      { pin: '395003', district: 'Surat Varachha', mules: 490, blocked: '₹4.30 Cr', type: 'CURRENT_MULE' },
-      { pin: '360001', district: 'Rajkot Jn', mules: 360, blocked: '₹2.10 Cr', type: 'DIAMOND_QR' }
+      { pin: '395003', district: 'Surat Ring Rd', mules: 620, blocked: '₹8.90 Cr', type: 'DABBA_TRADE' },
+      { pin: '380001', district: 'Ahmedabad GPO', mules: 510, blocked: '₹4.30 Cr', type: 'IPO_ALLOT' }
     ]
   },
   {
@@ -185,17 +184,17 @@ const INDIA_STATES_HEATMAP_DATA = [
     capital: 'Hyderabad',
     hotspots: 'Cyberabad, HITEC City, Secunderabad',
     riskIndex: 84.6,
-    activeThreatNodes: 1790,
-    blockedVolumeCr: '11.90',
-    primaryModus: 'Instant Micro-Loan Apps & Photo Morphed Blackmail',
-    topMuleBanks: ['Union Bank of India', 'State Bank of India', 'ICICI Bank'],
-    dominantBranchIFSC: ['UBIN0532185', 'HDFC0000521', 'SBIN0000851'],
+    activeThreatNodes: 1890,
+    blockedVolumeCr: '13.80',
+    primaryModus: 'Instant Chinese Loan App Extortion & Betting Apps',
+    topMuleBanks: ['Union Bank of India', 'HDFC Bank', 'State Bank of India'],
+    dominantBranchIFSC: ['UBIN0800015', 'HDFC0000547', 'SBIN0011662'],
     severity: 'HIGH',
     vulnerabilityRank: '#9',
-    coordinates: { x: 46, y: 59 },
+    coordinates: { x: 48, y: 62 },
     pinCodes: [
-      { pin: '500081', district: 'Madhapur', mules: 690, blocked: '₹6.10 Cr', type: 'LOAN_HARASS' },
-      { pin: '500003', district: 'Secunderabad', mules: 450, blocked: '₹3.40 Cr', type: 'JOB_SCAM' }
+      { pin: '500081', district: 'HITEC City', mules: 480, blocked: '₹7.60 Cr', type: 'LOAN_APP' },
+      { pin: '500003', district: 'Secunderabad', mules: 360, blocked: '₹4.10 Cr', type: 'BETTING' }
     ]
   }
 ];
@@ -213,7 +212,7 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
     mobile: '9845012345'
   });
 
-  // Navigation tabs: 'threat_heatmap' | 'database_search' | 'disputes' | 'statistics_impact' | 'audio_lab' | 'sim_carrier' | 'advisories'
+  // Navigation tabs: 'dashboard' | 'threat_heatmap' | 'database_search' | 'disputes' | 'statistics_impact' | 'audio_lab' | 'sim_carrier' | 'advisories'
   const [activeTab, setActiveTab] = useState('threat_heatmap');
   const [appeals, setAppeals] = useState([]);
   const [threats, setThreats] = useState(() => Array.isArray(INITIAL_THREAT_RECORDS) ? INITIAL_THREAT_RECORDS : []);
@@ -235,6 +234,18 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
   const [newThreatIdentifier, setNewThreatIdentifier] = useState('');
   const [newThreatCategory, setNewThreatCategory] = useState('DIGITAL_ARREST');
   const [newThreatDetails, setNewThreatDetails] = useState('');
+
+  // Database Filter & Pagination States (Top-level Hook Declarations)
+  const [selectedType, setSelectedType] = useState('ALL');
+  const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [selectedRows, setSelectedRows] = useState(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 12;
+
+  // Live Interception Feed Filter & Pagination States
+  const [feedTypeFilter, setFeedTypeFilter] = useState('ALL'); // 'ALL' | 'UPI' | 'BANK' | 'SIM'
+  const [feedSearch, setFeedSearch] = useState('');
+  const [feedPage, setFeedPage] = useState(1);
 
   // ROI Slider
   const [simulatedTxnVolume, setSimulatedTxnVolume] = useState(100000);
@@ -287,7 +298,7 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
       });
 
       setAppeals(prev => prev.map(a => {
-        if ((a.appealId || a.ticketId) === appealId) {
+        if ((a.appealId || a.ticketId || a.id) === appealId) {
           return { ...a, status: decision, resolvedAt: new Date().toISOString() };
         }
         return a;
@@ -325,7 +336,100 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
     setTimeout(() => setActionSuccess(''), 3000);
   };
 
-  const pendingCount = appeals.filter(a => a && a.status === 'PENDING_REVIEW').length;
+  const pendingCount = appeals.filter(a => a && (a.status === 'PENDING_REVIEW' || a.status === 'PENDING' || !a.status)).length || 3;
+
+  // Filtered threats for Database Table
+  const filteredThreats = threats.filter(t => {
+    const matchesQuery = !searchQuery || 
+      t.identifier?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.source?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = selectedType === 'ALL' || t.type?.toUpperCase() === selectedType;
+    const matchesCategory = selectedCategory === 'ALL' || t.category?.toUpperCase() === selectedCategory;
+    return matchesQuery && matchesType && matchesCategory;
+  });
+
+  const totalPages = Math.ceil(filteredThreats.length / pageSize) || 1;
+  const paginatedThreats = filteredThreats.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const toggleSelectAll = () => {
+    if (selectedRows.size === paginatedThreats.length) {
+      setSelectedRows(new Set());
+    } else {
+      setSelectedRows(new Set(paginatedThreats.map((_, i) => i)));
+    }
+  };
+
+  const toggleSelectRow = (idx) => {
+    const next = new Set(selectedRows);
+    if (next.has(idx)) next.delete(idx);
+    else next.add(idx);
+    setSelectedRows(next);
+  };
+
+  const exportData = (format) => {
+    const dataStr = format === 'json'
+      ? "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(filteredThreats, null, 2))
+      : "data:text/csv;charset=utf-8," + encodeURIComponent(
+          ["Identifier,Type,Category,RiskScore,Source", ...filteredThreats.map(t => `"${t.identifier}","${t.type}","${t.category}",${t.riskScore || 95},"${t.source || 'I4C'}"`)].join("\n")
+        );
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `verix_threat_registry_${Date.now()}.${format}`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    setActionSuccess(`Exported ${filteredThreats.length} records to ${format.toUpperCase()}`);
+    setTimeout(() => setActionSuccess(''), 3000);
+  };
+
+  // Sample Live Feed Items for Dashboard
+  const liveInterceptionFeed = [
+    { time: '14:22:01', id: 'scammer.cybercell@oksbi', type: 'UPI', risk: 98, status: 'BLOCKED' },
+    { time: '14:21:45', id: '+91 98765 43210', type: 'SIM SWAP', risk: 92, status: 'BLOCKED' },
+    { time: '14:20:12', id: 'ACC_09918237', type: 'BANK TRANSFER', risk: 78, status: 'FLAGGED' },
+    { time: '14:18:59', id: 'fake.helpline@ybl', type: 'UPI', risk: 12, status: 'SAFE' },
+    { time: '14:15:30', id: 'cbi.officer.verma@oksbi', type: 'UPI', risk: 96, status: 'BLOCKED' },
+    { time: '14:12:10', id: '+91 94775 30475', type: 'SIM SWAP', risk: 94, status: 'BLOCKED' },
+    { time: '14:09:40', id: 'SBIN0001234_50100432', type: 'BANK TRANSFER', risk: 91, status: 'BLOCKED' }
+  ].filter(item => {
+    if (feedTypeFilter === 'ALL') return true;
+    if (feedTypeFilter === 'UPI') return item.type === 'UPI';
+    if (feedTypeFilter === 'BANK') return item.type === 'BANK TRANSFER';
+    if (feedTypeFilter === 'SIM') return item.type === 'SIM SWAP';
+    return true;
+  });
+
+  // Sample Appeals for Disputes Tab
+  const displayAppeals = appeals.length > 0 ? appeals : [
+    {
+      id: 'APP-8924-X',
+      ticketId: 'APP-8924-X',
+      identifier: 'Acct: 4892-***-229',
+      vpa: 'merchant.kirana@paytm',
+      amount: '₹12,450.00',
+      reason: 'Velocity Spike',
+      details: 'Legitimate grocery store QR mistakenly reported by competitor.'
+    },
+    {
+      id: 'APP-8925-Y',
+      ticketId: 'APP-8925-Y',
+      identifier: 'IP: 192.168.1.104',
+      vpa: 'student.hostel@oksbi',
+      amount: '₹3,200.50',
+      reason: 'Geo Mismatch',
+      details: 'Student transacting from college campus hostel Wi-Fi proxy.'
+    },
+    {
+      id: 'APP-8926-Z',
+      ticketId: 'APP-8926-Z',
+      identifier: 'Dev: MAC-99A1',
+      vpa: 'freelance.designer@icici',
+      amount: '₹850.00',
+      reason: 'New Device Login',
+      details: 'Designer upgraded to new laptop for client project delivery.'
+    }
+  ];
 
   // ════════════════════════════════════════════════════════════════════════════════
   // 1. SECURE ACCESS TERMINAL (LOGIN SCREEN)
@@ -577,17 +681,17 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
               <Shield className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-xs font-bold text-white">NATIONAL DEFENSE</div>
-              <div className="text-[10px] text-[#e4bdba]">V-01 COMMAND</div>
+              <div className="text-xs font-bold text-white">STRATEGIC OPS</div>
+              <div className="text-[10px] text-[#e4bdba]">V.4.2.0</div>
             </div>
           </div>
 
-          {/* Nav Items (7-Module Exact Order) */}
+          {/* Nav Items */}
           <div className="flex-1 py-3 overflow-y-auto flex flex-col gap-1 px-2">
             {[
               { id: 'threat_heatmap', label: 'Threat Heatmaps', icon: Globe, count: null },
               { id: 'database_search', label: 'Threat Registry', icon: Database, count: threats.length.toLocaleString() },
-              { id: 'disputes', label: 'Appeals Review', icon: FileText, count: pendingCount > 0 ? `${pendingCount} PENDING` : null, alert: pendingCount > 0 },
+              { id: 'disputes', label: 'Appeals Review', icon: FileText, count: `${pendingCount} PENDING`, alert: pendingCount > 0 },
               { id: 'statistics_impact', label: 'ROI Analytics', icon: BarChart3, count: '₹14.8Cr' },
               { id: 'audio_lab', label: 'Voice Phishing Lab', icon: Mic, count: 'AI' },
               { id: 'sim_carrier', label: 'SIM Swap Monitor', icon: Radio, count: 'IMSI' },
@@ -598,17 +702,19 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
                 onClick={() => setActiveTab(id)}
                 className={`w-full flex items-center justify-between px-3 py-2.5 text-xs transition-all cursor-pointer text-left ${
                   activeTab === id
-                    ? 'bg-[#171E2B] text-[#00F0A0] border-l-4 border-[#00F0A0] font-bold'
+                    ? 'bg-white/10 text-white border-r-2 border-white font-bold'
                     : 'text-[#e4bdba] hover:bg-[#171E2B] hover:text-white'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <Icon className="w-4 h-4" />
-                  <span className="uppercase text-[11px]">{label}</span>
+                  <Icon className={`w-4 h-4 ${activeTab === id ? 'text-[#00F0A0]' : 'text-[#e4bdba]'}`} />
+                  <span>{label}</span>
                 </div>
                 {count && (
-                  <span className={`text-[9px] px-1.5 py-0.5 border ${
-                    alert ? 'border-amber-400 bg-amber-400/20 text-amber-300 animate-pulse' : 'border-white/[0.08] bg-[#10141C] text-white'
+                  <span className={`text-[10px] px-1.5 py-0.2 font-mono ${
+                    alert 
+                      ? 'bg-[#FF4B4B]/20 text-[#FF4B4B] border border-[#FF4B4B]/40' 
+                      : 'bg-white/[0.06] text-[#e4bdba]'
                   }`}>
                     {count}
                   </span>
@@ -617,186 +723,224 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
             ))}
           </div>
 
-          {/* Footer Telemetry */}
-          <div className="p-3 border-t border-white/[0.08] space-y-2">
+          {/* Left Rail Footer */}
+          <div className="p-3 border-t border-white/[0.08] bg-[#0A0D14] flex flex-col gap-2">
             <button
               onClick={() => setIsAuthenticated(false)}
-              className="w-full py-1.5 border border-white/[0.08] bg-transparent text-[#fadcd9] hover:bg-[#171E2B] text-[11px] uppercase transition-colors"
+              className="w-full py-1.5 text-center text-xs text-[#FF4B4B] hover:bg-[#FF4B4B]/10 border border-[#FF4B4B]/30 transition-all cursor-pointer"
             >
               LOGOUT TERMINAL
             </button>
-            <div className="flex items-center justify-between text-[10px] text-[#e4bdba]">
-              <span>STATION: {loginForm.state.substring(0, 3).toUpperCase()}-01-NX</span>
-              <span className="flex items-center gap-1 text-[#00EF9F]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00EF9F] animate-pulse" />
-                DB_SYNC_OK
-              </span>
+            <div className="flex justify-between text-[10px] text-[#e4bdba] opacity-60">
+              <span>STATION: BLR-01-NX</span>
+              <span>DB_SYNC_OK</span>
             </div>
           </div>
         </nav>
 
-        {/* ── CENTER WORKSPACE ── */}
-        <main className="flex-1 flex flex-col p-2 gap-2 mr-80 overflow-hidden bg-[#000000]">
+        {/* ── CENTER WORKSPACE CANVAS ── */}
+        <main className="flex-1 flex flex-col overflow-hidden bg-[#0A0D14] p-3 gap-3">
           
           {/* ══════════════════════════════════════════════════════════════
-              TAB 1: THREAT HEATMAPS (100% INDIA DRILLDOWN)
+              TAB 1: THREAT HEATMAPS (100% INDIA GEOSPATIAL RADAR)
           ══════════════════════════════════════════════════════════════ */}
           {activeTab === 'threat_heatmap' && (
-            <div className="flex-1 flex flex-col gap-2 min-h-0">
+            <div className="flex-1 flex flex-col gap-3 overflow-hidden">
               
-              {/* 60/40 Split Canvas */}
-              <div className="flex-1 flex gap-2 min-h-0">
+              {/* Top Split (60% Map Canvas | 40% Selected State Dossier) */}
+              <div className="flex flex-1 gap-3 overflow-hidden min-h-0">
                 
-                {/* Left 60%: India Geospatial Telemetry */}
-                <div className="w-3/5 bg-[#10141C] border border-white/[0.08] flex flex-col relative overflow-hidden">
+                {/* Left 60%: Interactive SVG India Radar Map */}
+                <div className="w-[60%] bg-[#10141C] border border-white/[0.08] flex flex-col overflow-hidden relative">
                   
-                  {/* Top Header of Map */}
-                  <div className="p-2.5 bg-[#171E2B] border-b border-white/[0.08] flex justify-between items-center z-10">
+                  {/* Map Header */}
+                  <div className="p-3 border-b border-white/[0.08] flex justify-between items-center bg-[#171E2B]/50">
                     <div className="flex items-center gap-2">
                       <Satellite className="w-4 h-4 text-[#00F0A0]" />
-                      <span className="text-[11px] uppercase tracking-wider text-white font-bold">
-                        India Geospatial Telemetry
+                      <span className="text-xs font-bold text-white tracking-wider uppercase">
+                        Satellite India Geospatial Telemetry
                       </span>
                     </div>
 
                     {/* State Selector Dropdown */}
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-[#e4bdba]">Focus:</span>
+                      <label className="text-[10px] text-[#e4bdba] uppercase">Select State:</label>
                       <select
                         value={selectedStateId}
                         onChange={(e) => setSelectedStateId(e.target.value)}
-                        className="bg-[#000000] border border-white/[0.1] text-xs text-[#00F0A0] py-0.5 px-2 focus:outline-none"
+                        className="bg-[#10141C] border border-white/[0.08] text-xs text-[#00F0A0] px-2 py-1 focus:outline-none cursor-pointer"
                       >
-                        {INDIA_STATES_HEATMAP_DATA.map(st => (
-                          <option key={st.id} value={st.id}>{st.vulnerabilityRank} {st.state} ({st.riskIndex}%)</option>
+                        {INDIA_STATES_HEATMAP_DATA.map(s => (
+                          <option key={s.id} value={s.id}>
+                            {s.vulnerabilityRank} {s.state} ({s.riskIndex}%)
+                          </option>
                         ))}
                       </select>
                     </div>
                   </div>
 
-                  {/* Interactive Vector Grid Map Canvas */}
-                  <div className="flex-1 relative flex items-center justify-center p-4"
-                    style={{
-                      backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)',
-                      backgroundSize: '32px 32px'
-                    }}
-                  >
-                    {/* SVG Base India Geometric Wireframe */}
-                    <svg viewBox="0 0 100 100" className="w-full h-full max-h-72 opacity-80 filter drop-shadow-[0_0_15px_rgba(0,240,160,0.15)]">
-                      <path
-                        d="M 38 12 L 48 8 L 54 14 L 46 22 L 56 26 L 68 28 L 74 36 L 86 38 L 82 46 L 72 48 L 68 56 L 62 66 L 52 86 L 46 88 L 44 76 L 36 64 L 28 54 L 20 48 L 22 36 L 30 26 Z"
-                        fill="#171E2B"
+                  {/* Vector Map Canvas */}
+                  <div className="flex-1 relative flex items-center justify-center p-4 overflow-hidden bg-[#05080E]">
+                    {/* Radar Scanning Line */}
+                    <div className="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(rgba(0,240,160,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,240,160,0.1)_1px,transparent_1px)] bg-[size:32px_32px]" />
+
+                    {/* India Map Geometric Representation */}
+                    <svg viewBox="0 0 100 100" className="w-full h-full max-h-[380px] filter drop-shadow-[0_0_15px_rgba(0,240,160,0.15)]">
+                      {/* Outline Polygon */}
+                      <polygon
+                        points="35,10 45,8 55,14 62,22 68,26 80,30 85,38 78,45 82,55 72,60 60,65 52,78 45,92 38,82 32,68 25,58 20,45 22,32 30,22"
+                        fill="#101726"
                         stroke="#00F0A0"
                         strokeWidth="0.8"
-                        strokeDasharray="2 1"
+                        strokeDasharray="2,1"
                       />
-                      <circle cx="50" cy="50" r="40" fill="none" stroke="#00D2FF" strokeWidth="0.2" strokeOpacity="0.4" />
-                      <circle cx="50" cy="50" r="25" fill="none" stroke="#FF4B4B" strokeWidth="0.2" strokeOpacity="0.4" />
+
+                      {/* State Nodes */}
+                      {INDIA_STATES_HEATMAP_DATA.map((state) => {
+                        const isSelected = state.id === selectedStateId;
+                        const isCritical = state.riskIndex >= 90;
+                        return (
+                          <g
+                            key={state.id}
+                            className="cursor-pointer transition-all hover:scale-125"
+                            onClick={() => setSelectedStateId(state.id)}
+                          >
+                            <circle
+                              cx={state.coordinates.x}
+                              cy={state.coordinates.y}
+                              r={isSelected ? 3.5 : 2}
+                              fill={isCritical ? '#FF4B4B' : '#00D2FF'}
+                              className={isCritical ? 'animate-pulse' : ''}
+                            />
+                            {isSelected && (
+                              <circle
+                                cx={state.coordinates.x}
+                                cy={state.coordinates.y}
+                                r={6}
+                                fill="none"
+                                stroke="#00F0A0"
+                                strokeWidth="0.8"
+                                className="animate-ping"
+                              />
+                            )}
+                            <text
+                              x={state.coordinates.x + 3}
+                              y={state.coordinates.y + 1}
+                              fontSize="3.2"
+                              fill={isSelected ? '#00F0A0' : '#fadcd9'}
+                              fontWeight={isSelected ? 'bold' : 'normal'}
+                              className="font-mono select-none"
+                            >
+                              {state.id} ({state.riskIndex}%)
+                            </text>
+                          </g>
+                        );
+                      })}
                     </svg>
 
-                    {/* Interactive State Pins */}
-                    {INDIA_STATES_HEATMAP_DATA.map(st => {
-                      const isSelected = st.id === selectedStateId;
-                      return (
-                        <button
-                          key={st.id}
-                          onClick={() => setSelectedStateId(st.id)}
-                          style={{ left: `${st.coordinates.x}%`, top: `${st.coordinates.y}%` }}
-                          className={`absolute -translate-x-1/2 -translate-y-1/2 p-1 cursor-pointer transition-all z-20 ${
-                            isSelected ? 'scale-150 ring-2 ring-[#00F0A0]' : 'hover:scale-125'
-                          }`}
-                          title={`${st.state}: ${st.riskIndex}% Risk`}
-                        >
-                          <span className={`w-2.5 h-2.5 block rounded-full ${
-                            st.riskIndex >= 90 ? 'bg-[#FF4B4B] animate-pulse shadow-[0_0_10px_#FF4B4B]' : 'bg-[#00D2FF]'
-                          }`} />
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Bottom Map Status */}
-                  <div className="p-2 border-t border-white/[0.08] bg-[#171E2B] flex justify-between items-center text-[10px] text-[#e4bdba]">
-                    <span>CURRENT JURISDICTION: <strong className="text-white">{selectedState.state}</strong></span>
-                    <span className="text-[#00F0A0]">NODES: {selectedState.activeThreatNodes.toLocaleString()}</span>
+                    {/* Bottom Status Overlay */}
+                    <div className="absolute bottom-2 left-3 right-3 flex justify-between text-[10px] text-[#e4bdba] bg-[#10141C]/80 p-2 border border-white/[0.08]">
+                      <span>CURRENT JURISDICTION: <strong className="text-[#00F0A0]">{selectedState.state}</strong></span>
+                      <span>ACTIVE THREAT NODES: <strong className="text-white">{selectedState.activeThreatNodes.toLocaleString()}</strong></span>
+                      <span>24H BLOCKED: <strong className="text-[#FF4B4B]">₹{selectedState.blockedVolumeCr} Cr</strong></span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Right 40%: State Dossier Panel */}
-                <div className="w-2/5 bg-[#10141C] border border-white/[0.08] flex flex-col">
+                {/* Right 40%: Selected State Deep-Dive Dossier */}
+                <div className="w-[40%] bg-[#10141C] border border-white/[0.08] flex flex-col overflow-hidden">
                   
-                  <div className="p-3 border-b border-white/[0.08] bg-[#171E2B] flex flex-col gap-1">
-                    <div className="flex justify-between items-start">
-                      <h2 className="text-base font-bold text-white font-sans">{selectedState.state}</h2>
-                      <div className="text-right">
-                        <div className="text-[9px] text-[#e4bdba] uppercase">Threat Index</div>
-                        <div className="text-2xl text-[#FF4B4B] font-bold leading-none">{selectedState.riskIndex}</div>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 mt-1 border-t border-white/[0.08] pt-1 text-xs">
-                      <div>
-                        <div className="text-[9px] text-[#e4bdba]">Blocked (24H)</div>
-                        <div className="text-white font-bold">₹{selectedState.blockedVolumeCr} Cr</div>
-                      </div>
-                      <div>
-                        <div className="text-[9px] text-[#e4bdba]">Hotspots</div>
-                        <div className="text-amber-300 text-[10px] truncate">{selectedState.hotspots}</div>
-                      </div>
-                    </div>
+                  <div className="p-3 border-b border-white/[0.08] flex justify-between items-center bg-[#171E2B]/50">
+                    <span className="text-xs font-bold text-white tracking-wider uppercase">
+                      Selected State Dossier
+                    </span>
+                    <span className={`text-[10px] px-2 py-0.5 font-bold ${
+                      selectedState.severity === 'CRITICAL' ? 'bg-[#FF4B4B]/20 text-[#FF4B4B] border border-[#FF4B4B]' : 'bg-[#00F0A0]/20 text-[#00F0A0]'
+                    }`}>
+                      {selectedState.severity}
+                    </span>
                   </div>
 
-                  {/* Dense Data Table for PIN Codes */}
-                  <div className="flex-1 overflow-auto flex flex-col">
-                    <div className="px-2.5 py-1.5 bg-[#171E2B] border-b border-white/[0.08] text-[10px] text-[#e4bdba] flex justify-between">
-                      <span>HOT PIN CODES ({selectedState.state})</span>
-                      <span>MULES</span>
-                    </div>
-
-                    <div className="w-full text-[11px]">
-                      <div className="flex w-full bg-[#10141C] border-b border-white/[0.08] text-[#e4bdba] px-2 py-1 text-[10px]">
-                        <div className="w-1/4">PIN</div>
-                        <div className="w-2/4">DISTRICT</div>
-                        <div className="w-1/4 text-right">MULES</div>
+                  <div className="flex-1 p-3 overflow-y-auto space-y-3">
+                    
+                    {/* Header Details */}
+                    <div className="flex justify-between items-start border-b border-white/[0.08] pb-2">
+                      <div>
+                        <h3 className="text-base font-bold text-white">{selectedState.state}</h3>
+                        <p className="text-[10.5px] text-[#e4bdba]">Capital: {selectedState.capital} • Hotspots: {selectedState.hotspots}</p>
                       </div>
-
-                      {selectedState.pinCodes.map(p => (
-                        <div key={p.pin} className="flex w-full px-2 py-1.5 border-b border-white/[0.04] hover:bg-[#171E2B] text-white cursor-pointer">
-                          <div className="w-1/4 text-[#00F0A0]">{p.pin}</div>
-                          <div className="w-2/4 truncate text-[#e4bdba]">{p.district}</div>
-                          <div className="w-1/4 text-right text-[#FF4B4B] font-bold">{p.mules}</div>
-                        </div>
-                      ))}
+                      <div className="text-right">
+                        <div className="text-[10px] text-[#e4bdba]">Threat Index</div>
+                        <div className="text-xl font-bold text-[#FF4B4B]">{selectedState.riskIndex}</div>
+                      </div>
                     </div>
 
-                    <div className="p-2 border-t border-white/[0.08] mt-auto">
-                      <div className="text-[9px] text-[#e4bdba] mb-1">FLAGGED IFSC BRANCHES</div>
-                      <div className="flex flex-wrap gap-1">
-                        {selectedState.dominantBranchIFSC.map(ifsc => (
-                          <span key={ifsc} className="px-1.5 py-0.5 bg-[#171E2B] border border-white/[0.08] text-[10px] text-[#00F0A0]">
+                    {/* Primary Scam Type */}
+                    <div className="p-2 bg-[#171E2B] border border-white/[0.08] text-xs">
+                      <span className="text-[10px] text-[#e4bdba] block uppercase">Primary Modus Operandi:</span>
+                      <p className="text-white text-[11px] mt-0.5">{selectedState.primaryModus}</p>
+                    </div>
+
+                    {/* Critical Clusters: Hot PIN Codes */}
+                    <div>
+                      <span className="text-[10.5px] text-white font-bold uppercase block mb-1.5">
+                        Critical Clusters (Hot PIN Codes)
+                      </span>
+                      <div className="border border-white/[0.08] overflow-hidden">
+                        <table className="w-full text-left text-[11px]">
+                          <thead className="bg-[#171E2B] text-[#e4bdba] text-[9.5px] uppercase">
+                            <tr>
+                              <th className="p-1.5">PIN</th>
+                              <th className="p-1.5">District</th>
+                              <th className="p-1.5 text-right">Mules</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {selectedState.pinCodes.map((p, i) => (
+                              <tr key={i} className="border-t border-white/[0.04] text-white hover:bg-[#171E2B]">
+                                <td className="p-1.5 font-bold text-[#FF4B4B]">{p.pin}</td>
+                                <td className="p-1.5">{p.district}</td>
+                                <td className="p-1.5 text-right text-[#00F0A0]">{p.mules.toLocaleString()}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Compromised Routing Nodes: IFSC */}
+                    <div>
+                      <span className="text-[10.5px] text-white font-bold uppercase block mb-1.5">
+                        Compromised Routing Nodes (IFSC)
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedState.dominantBranchIFSC.map((ifsc, i) => (
+                          <span key={i} className="px-2 py-0.5 bg-[#171E2B] border border-white/[0.08] text-[10px] text-[#00F0A0] font-mono">
                             {ifsc}
                           </span>
                         ))}
                       </div>
                     </div>
+
                   </div>
                 </div>
 
               </div>
 
-              {/* Bottom Row (3 Columns) */}
-              <div className="h-36 flex gap-2 shrink-0">
+              {/* Bottom 3-Column Telemetry Row (H-28) */}
+              <div className="h-28 flex gap-3 shrink-0">
                 
                 {/* 5a: Target Locator */}
-                <div className="w-1/4 bg-[#10141C] border border-white/[0.08] p-3 flex flex-col justify-between">
+                <div className="w-64 bg-[#10141C] border border-white/[0.08] p-3 flex flex-col justify-between">
                   <div>
-                    <div className="text-[11px] text-white flex items-center gap-1.5 font-bold uppercase mb-1">
-                      <Search className="w-3.5 h-3.5 text-[#00F0A0]" />
+                    <div className="text-[11px] text-[#e4bdba] uppercase font-bold flex items-center gap-1">
+                      <Target className="w-3.5 h-3.5 text-[#00F0A0]" />
                       Target Locator
                     </div>
-                    <p className="text-[10px] text-[#e4bdba]">Enter 6-digit PIN or IFSC for rapid dossier extraction.</p>
+                    <p className="text-[10px] text-[#e4bdba] opacity-70 mt-0.5">Instant PIN / IFSC Vector lookup</p>
                   </div>
                   <div className="relative">
-                    <span className="absolute left-2 top-2 text-[#e4bdba] text-xs">&gt;</span>
+                    <Search className="w-3.5 h-3.5 text-[#e4bdba] absolute left-2 top-2" />
                     <input
                       type="text"
                       value={pinSearch}
@@ -870,358 +1014,274 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
           )}
 
           {/* ══════════════════════════════════════════════════════════════
-              TAB 2: THREAT REGISTRY DATABASE (STITCH COMPLETE TABLE & FILTERS)
+              TAB 2: THREAT REGISTRY DATABASE (FULL SEARCH TABLE & EXPORT)
           ══════════════════════════════════════════════════════════════ */}
-          {activeTab === 'database_search' && (() => {
-            const [selectedType, setSelectedType] = useState('ALL');
-            const [selectedCategory, setSelectedCategory] = useState('ALL');
-            const [selectedRows, setSelectedRows] = useState(new Set());
-            const [currentPage, setCurrentPage] = useState(1);
-            const pageSize = 12;
+          {activeTab === 'database_search' && (
+            <div className="flex-1 bg-[#141313] flex flex-col overflow-hidden text-[#e5e2e1]">
+              
+              {/* Page Header & Actions */}
+              <div className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 border-b border-white/10 bg-[#141313]">
+                <div>
+                  <h1 className="text-xl font-bold text-white font-sans tracking-tight">National Threat Registry Database</h1>
+                  <p className="text-xs text-[#8e9193] mt-0.5 font-mono">{filteredThreats.length.toLocaleString()} Records Found</p>
+                </div>
+                <button
+                  onClick={() => setShowAddThreatModal(true)}
+                  className="bg-white text-black font-bold text-xs uppercase px-4 py-2 hover:bg-white/90 transition-colors flex items-center gap-2 border border-white cursor-pointer active:scale-95"
+                >
+                  <span className="text-base leading-none font-black">+</span>
+                  <span>ADD RECORD</span>
+                </button>
+              </div>
 
-            const filteredThreats = threats.filter(t => {
-              const matchesQuery = !searchQuery || 
-                t.identifier?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                t.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                t.source?.toLowerCase().includes(searchQuery.toLowerCase());
-              const matchesType = selectedType === 'ALL' || t.type?.toUpperCase() === selectedType;
-              const matchesCategory = selectedCategory === 'ALL' || t.category?.toUpperCase() === selectedCategory;
-              return matchesQuery && matchesType && matchesCategory;
-            });
+              {/* Search & Filter Bar */}
+              <div className="px-6 py-3 shrink-0 bg-[#0e0e0e] border-b border-white/10 flex flex-col md:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 text-[#8e9193] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                    placeholder="Search VPA, Phone, IFSC, or Identifier..."
+                    className="w-full bg-[#141313] border border-white/10 text-white pl-9 pr-4 py-2 text-xs font-mono focus:border-white/40 focus:outline-none placeholder:text-[#8e9193]/50 transition-colors"
+                  />
+                </div>
 
-            const totalPages = Math.ceil(filteredThreats.length / pageSize) || 1;
-            const paginatedThreats = filteredThreats.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+                {/* Filter by Type */}
+                <select
+                  value={selectedType}
+                  onChange={(e) => { setSelectedType(e.target.value); setCurrentPage(1); }}
+                  className="bg-[#141313] border border-white/10 text-xs text-[#e5e2e1] px-3 py-2 focus:border-white/40 focus:outline-none cursor-pointer"
+                >
+                  <option value="ALL">TYPE: ALL</option>
+                  <option value="VPA">VPA (UPI)</option>
+                  <option value="PHONE">PHONE</option>
+                  <option value="BANK_ACC">BANK ACC</option>
+                </select>
 
-            const toggleSelectAll = () => {
-              if (selectedRows.size === paginatedThreats.length) {
-                setSelectedRows(new Set());
-              } else {
-                setSelectedRows(new Set(paginatedThreats.map((_, i) => i)));
-              }
-            };
+                {/* Filter by Category */}
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => { setSelectedCategory(e.target.value); setCurrentPage(1); }}
+                  className="bg-[#141313] border border-white/10 text-xs text-[#e5e2e1] px-3 py-2 focus:border-white/40 focus:outline-none cursor-pointer"
+                >
+                  <option value="ALL">CATEGORY: ALL</option>
+                  <option value="DIGITAL_ARREST">DIGITAL ARREST</option>
+                  <option value="MULE_ACCOUNT">MULE ACCOUNT</option>
+                  <option value="ELECTRICITY_BILL">POWER CUT SMS</option>
+                  <option value="PART_TIME_JOB">JOB SCAM</option>
+                  <option value="CUSTOMS_PARCEL">CUSTOMS PARCEL</option>
+                  <option value="SEXTO">SEXTORTION</option>
+                </select>
 
-            const toggleSelectRow = (idx) => {
-              const next = new Set(selectedRows);
-              if (next.has(idx)) next.delete(idx);
-              else next.add(idx);
-              setSelectedRows(next);
-            };
-
-            const exportData = (format) => {
-              const dataStr = format === 'json'
-                ? "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(filteredThreats, null, 2))
-                : "data:text/csv;charset=utf-8," + encodeURIComponent(
-                    ["Identifier,Type,Category,RiskScore,Source", ...filteredThreats.map(t => `"${t.identifier}","${t.type}","${t.category}",${t.riskScore || 95},"${t.source || 'I4C'}"`)].join("\n")
-                  );
-              const downloadAnchor = document.createElement('a');
-              downloadAnchor.setAttribute("href", dataStr);
-              downloadAnchor.setAttribute("download", `verix_threat_registry_${Date.now()}.${format}`);
-              document.body.appendChild(downloadAnchor);
-              downloadAnchor.click();
-              downloadAnchor.remove();
-              setActionSuccess(`Exported ${filteredThreats.length} records to ${format.toUpperCase()}`);
-              setTimeout(() => setActionSuccess(''), 3000);
-            };
-
-            return (
-              <div className="flex-1 bg-[#141313] flex flex-col overflow-hidden text-[#e5e2e1]">
-                
-                {/* Page Header & Actions */}
-                <div className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 border-b border-white/10 bg-[#141313]">
-                  <div>
-                    <h1 className="text-xl font-bold text-white font-sans tracking-tight">National Threat Registry Database</h1>
-                    <p className="text-xs text-[#8e9193] mt-0.5 font-mono">{filteredThreats.length.toLocaleString()} Records Found</p>
-                  </div>
+                <div className="flex gap-2">
                   <button
-                    onClick={() => setShowAddThreatModal(true)}
-                    className="bg-white text-black font-bold text-xs uppercase px-4 py-2 hover:bg-white/90 transition-colors flex items-center gap-2 border border-white cursor-pointer active:scale-95"
+                    onClick={() => exportData('csv')}
+                    className="bg-[#141313] border border-white/10 text-xs text-[#e5e2e1] px-3 py-2 hover:border-white/40 transition-colors flex items-center gap-1.5 cursor-pointer font-mono"
                   >
-                    <span className="text-base leading-none font-black">+</span>
-                    <span>ADD RECORD</span>
+                    <Download className="w-3.5 h-3.5" />
+                    <span>CSV</span>
+                  </button>
+                  <button
+                    onClick={() => exportData('json')}
+                    className="bg-[#141313] border border-white/10 text-xs text-[#e5e2e1] px-3 py-2 hover:border-white/40 transition-colors flex items-center gap-1.5 cursor-pointer font-mono"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>JSON</span>
                   </button>
                 </div>
+              </div>
 
-                {/* Search & Filter Bar */}
-                <div className="px-6 py-3 shrink-0 bg-[#0e0e0e] border-b border-white/10 flex flex-col md:flex-row gap-3">
-                  <div className="relative flex-1">
-                    <Search className="w-4 h-4 text-[#8e9193] absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                      placeholder="Search VPA, Phone, IFSC, or Identifier..."
-                      className="w-full bg-[#141313] border border-white/10 text-white pl-9 pr-4 py-2 text-xs font-mono focus:border-white/40 focus:outline-none placeholder:text-[#8e9193]/50 transition-colors"
-                    />
-                  </div>
-
-                  {/* Filter by Type */}
-                  <select
-                    value={selectedType}
-                    onChange={(e) => { setSelectedType(e.target.value); setCurrentPage(1); }}
-                    className="bg-[#141313] border border-white/10 text-xs text-[#e5e2e1] px-3 py-2 focus:border-white/40 focus:outline-none cursor-pointer"
-                  >
-                    <option value="ALL">TYPE: ALL</option>
-                    <option value="VPA">VPA (UPI)</option>
-                    <option value="PHONE">PHONE</option>
-                    <option value="BANK_ACC">BANK ACC</option>
-                  </select>
-
-                  {/* Filter by Category */}
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => { setSelectedCategory(e.target.value); setCurrentPage(1); }}
-                    className="bg-[#141313] border border-white/10 text-xs text-[#e5e2e1] px-3 py-2 focus:border-white/40 focus:outline-none cursor-pointer"
-                  >
-                    <option value="ALL">CATEGORY: ALL</option>
-                    <option value="DIGITAL_ARREST">DIGITAL ARREST</option>
-                    <option value="MULE_ACCOUNT">MULE ACCOUNT</option>
-                    <option value="ELECTRICITY_BILL">POWER CUT SMS</option>
-                    <option value="PART_TIME_JOB">JOB SCAM</option>
-                    <option value="CUSTOMS_PARCEL">CUSTOMS PARCEL</option>
-                    <option value="SEXTO">SEXTORTION</option>
-                  </select>
-
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => exportData('csv')}
-                      className="bg-[#141313] border border-white/10 text-xs text-[#e5e2e1] px-3 py-2 hover:border-white/40 transition-colors flex items-center gap-1.5 cursor-pointer font-mono"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>CSV</span>
-                    </button>
-                    <button
-                      onClick={() => exportData('json')}
-                      className="bg-[#141313] border border-white/10 text-xs text-[#e5e2e1] px-3 py-2 hover:border-white/40 transition-colors flex items-center gap-1.5 cursor-pointer font-mono"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>JSON</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Data Table Canvas */}
-                <div className="flex-1 overflow-auto px-6 py-4 bg-[#141313]">
-                  <div className="w-full min-w-[900px] border border-white/10 bg-[#0e0e0e] overflow-hidden">
-                    <table className="w-full text-left border-collapse font-mono">
-                      <thead className="bg-[#201f1f] border-b border-white/10 text-[10.5px] uppercase tracking-wider text-[#8e9193]">
+              {/* Data Table Canvas */}
+              <div className="flex-1 overflow-auto px-6 py-4 bg-[#141313]">
+                <div className="w-full min-w-[900px] border border-white/10 bg-[#0e0e0e] overflow-hidden">
+                  <table className="w-full text-left border-collapse font-mono">
+                    <thead className="bg-[#201f1f] border-b border-white/10 text-[10.5px] uppercase tracking-wider text-[#8e9193]">
+                      <tr>
+                        <th className="px-4 py-3 w-12 text-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedRows.size > 0 && selectedRows.size === paginatedThreats.length}
+                            onChange={toggleSelectAll}
+                            className="cursor-pointer accent-[#00F0A0]"
+                          />
+                        </th>
+                        <th className="px-4 py-3">IDENTIFIER (VPA/ACC)</th>
+                        <th className="px-4 py-3">TYPE</th>
+                        <th className="px-4 py-3">CATEGORY</th>
+                        <th className="px-4 py-3 text-right">RISK SCORE</th>
+                        <th className="px-4 py-3">SOURCE FEED</th>
+                        <th className="px-4 py-3 w-16 text-center">ACT</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-xs text-[#e5e2e1]">
+                      {paginatedThreats.length === 0 ? (
                         <tr>
-                          <th className="px-4 py-3 w-12 text-center">
-                            <input
-                              type="checkbox"
-                              checked={selectedRows.size > 0 && selectedRows.size === paginatedThreats.length}
-                              onChange={toggleSelectAll}
-                              className="cursor-pointer accent-[#00F0A0]"
-                            />
-                          </th>
-                          <th className="px-4 py-3">IDENTIFIER (VPA/ACC)</th>
-                          <th className="px-4 py-3">TYPE</th>
-                          <th className="px-4 py-3">CATEGORY</th>
-                          <th className="px-4 py-3 text-right">RISK SCORE</th>
-                          <th className="px-4 py-3">SOURCE FEED</th>
-                          <th className="px-4 py-3 w-16 text-center">ACT</th>
+                          <td colSpan={7} className="text-center py-12 text-[#8e9193]">
+                            No threat records match your current search and filter criteria.
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody className="text-xs text-[#e5e2e1]">
-                        {paginatedThreats.length === 0 ? (
-                          <tr>
-                            <td colSpan={7} className="text-center py-12 text-[#8e9193]">
-                              No threat records match your current search and filter criteria.
-                            </td>
-                          </tr>
-                        ) : (
-                          paginatedThreats.map((t, idx) => {
-                            const isEven = idx % 2 === 0;
-                            const isSelected = selectedRows.has(idx);
-                            const risk = t.riskScore || 95;
-                            const isCritical = risk >= 90;
-                            const isHigh = risk >= 70 && risk < 90;
+                      ) : (
+                        paginatedThreats.map((t, idx) => {
+                          const isEven = idx % 2 === 0;
+                          const isSelected = selectedRows.has(idx);
+                          const risk = t.riskScore || 95;
+                          const isCritical = risk >= 90;
+                          const isHigh = risk >= 70 && risk < 90;
 
-                            return (
-                              <tr
-                                key={t.id || idx}
-                                className={`border-b border-white/[0.06] transition-colors cursor-pointer group ${
-                                  isSelected ? 'bg-white/10' : (isEven ? 'bg-[#10141C]' : 'bg-[#171E2B]')
-                                } hover:bg-white/[0.08]`}
-                              >
-                                <td className="px-4 py-3 text-center">
-                                  <input
-                                    type="checkbox"
-                                    checked={isSelected}
-                                    onChange={() => toggleSelectRow(idx)}
-                                    className="cursor-pointer accent-[#00F0A0]"
-                                  />
-                                </td>
-                                <td className="px-4 py-3">
-                                  <div className="flex items-center gap-2 font-bold text-white">
-                                    <AlertTriangle className={`w-3.5 h-3.5 shrink-0 ${isCritical ? 'text-[#FF4B4B]' : 'text-amber-400'}`} />
-                                    <span className="truncate max-w-xs">{t.identifier}</span>
-                                  </div>
-                                </td>
-                                <td className="px-4 py-3 text-[#8e9193] font-bold">
-                                  <span className="px-1.5 py-0.5 bg-white/5 border border-white/10 text-[10px]">
-                                    {t.type || (t.identifier?.includes('@') ? 'VPA' : 'PHONE')}
-                                  </span>
-                                </td>
-                                <td className="px-4 py-3 text-[#e5e2e1] capitalize">
-                                  {t.category ? t.category.replace(/_/g, ' ').toLowerCase() : 'Mule Account'}
-                                </td>
-                                <td className="px-4 py-3 text-right font-bold">
-                                  <span className={isCritical ? 'text-[#FF4B4B]' : (isHigh ? 'text-amber-400' : 'text-[#8e9193]')}>
-                                    {risk}%
-                                  </span>
-                                </td>
-                                <td className="px-4 py-3 text-[#8e9193] text-[11px] truncate max-w-[200px]">
-                                  {t.source || 'I4C National FIR #8921'}
-                                </td>
-                                <td className="px-4 py-3 text-center">
-                                  <button
-                                    onClick={() => {
-                                      navigator.clipboard?.writeText(t.identifier);
-                                      setActionSuccess(`Copied ${t.identifier}`);
-                                      setTimeout(() => setActionSuccess(''), 2000);
-                                    }}
-                                    title="Copy Identifier"
-                                    className="text-[#8e9193] hover:text-white transition-colors cursor-pointer p-1"
-                                  >
-                                    <Copy className="w-3.5 h-3.5" />
-                                  </button>
-                                </td>
-                              </tr>
-                            );
-                          })
-                        )}
-                      </tbody>
-                    </table>
+                          return (
+                            <tr
+                              key={t.id || idx}
+                              className={`border-b border-white/[0.06] transition-colors cursor-pointer group ${
+                                isSelected ? 'bg-white/10' : (isEven ? 'bg-[#10141C]' : 'bg-[#171E2B]')
+                              } hover:bg-white/[0.08]`}
+                            >
+                              <td className="px-4 py-3 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={() => toggleSelectRow(idx)}
+                                  className="cursor-pointer accent-[#00F0A0]"
+                                />
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-2 font-bold text-white">
+                                  <AlertTriangle className={`w-3.5 h-3.5 shrink-0 ${isCritical ? 'text-[#FF4B4B]' : 'text-amber-400'}`} />
+                                  <span className="truncate max-w-xs">{t.identifier}</span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-[#8e9193] font-bold">
+                                <span className="px-1.5 py-0.5 bg-white/5 border border-white/10 text-[10px]">
+                                  {t.type || (t.identifier?.includes('@') ? 'VPA' : 'PHONE')}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-[#e5e2e1] capitalize">
+                                {t.category ? t.category.replace(/_/g, ' ').toLowerCase() : 'Mule Account'}
+                              </td>
+                              <td className="px-4 py-3 text-right font-bold">
+                                <span className={isCritical ? 'text-[#FF4B4B]' : (isHigh ? 'text-amber-400' : 'text-[#8e9193]')}>
+                                  {risk}%
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-[#8e9193] text-[11px] truncate max-w-[200px]">
+                                {t.source || 'I4C National FIR #8921'}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <button
+                                  onClick={() => {
+                                    navigator.clipboard?.writeText(t.identifier);
+                                    setActionSuccess(`Copied ${t.identifier}`);
+                                    setTimeout(() => setActionSuccess(''), 2000);
+                                  }}
+                                  title="Copy Identifier"
+                                  className="text-[#8e9193] hover:text-white transition-colors cursor-pointer p-1"
+                                >
+                                  <Copy className="w-3.5 h-3.5" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
 
-                    {/* Pagination / Footer */}
-                    <div className="bg-[#201f1f] px-4 py-3 border-t border-white/10 flex justify-between items-center text-[#8e9193] text-[11px] font-mono">
-                      <div>
-                        SHOWING {paginatedThreats.length > 0 ? (currentPage - 1) * pageSize + 1 : 0}-
-                        {Math.min(currentPage * pageSize, filteredThreats.length)} OF {filteredThreats.length.toLocaleString()}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                          disabled={currentPage === 1}
-                          className="px-2 py-1 bg-white/5 border border-white/10 hover:text-white disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-                        >
-                          &lt;
-                        </button>
-                        <span>PAGE {currentPage} OF {totalPages}</span>
-                        <button
-                          onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                          disabled={currentPage === totalPages}
-                          className="px-2 py-1 bg-white/5 border border-white/10 hover:text-white disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
-                        >
-                          &gt;
-                        </button>
-                      </div>
+                  {/* Pagination / Footer */}
+                  <div className="bg-[#201f1f] px-4 py-3 border-t border-white/10 flex justify-between items-center text-[#8e9193] text-[11px] font-mono">
+                    <div>
+                      SHOWING {paginatedThreats.length > 0 ? (currentPage - 1) * pageSize + 1 : 0}-
+                      {Math.min(currentPage * pageSize, filteredThreats.length)} OF {filteredThreats.length.toLocaleString()}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="px-2 py-1 bg-white/5 border border-white/10 hover:text-white disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      >
+                        &lt;
+                      </button>
+                      <span>PAGE {currentPage} OF {totalPages}</span>
+                      <button
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className="px-2 py-1 bg-white/5 border border-white/10 hover:text-white disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      >
+                        &gt;
+                      </button>
                     </div>
                   </div>
                 </div>
-
               </div>
-            );
-          })()}
+
+            </div>
+          )}
 
           {/* ══════════════════════════════════════════════════════════════
-              TAB 3: APPEALS REVIEW QUEUE (STITCH EXACT REVIEW CARDS)
+              TAB 3: APPEALS REVIEW QUEUE (STITCH EXACT CARDS)
           ══════════════════════════════════════════════════════════════ */}
-          {activeTab === 'disputes' && (() => {
-            const sampleAppeals = appeals.length > 0 ? appeals : [
-              {
-                id: 'APP-8924-X',
-                ticketId: 'APP-8924-X',
-                identifier: 'Acct: 4892-***-229',
-                vpa: 'merchant.kirana@paytm',
-                amount: '₹12,450.00',
-                reason: 'Velocity Spike',
-                details: 'Legitimate grocery store QR mistakenly reported by competitor.'
-              },
-              {
-                id: 'APP-8925-Y',
-                ticketId: 'APP-8925-Y',
-                identifier: 'IP: 192.168.1.104',
-                vpa: 'student.hostel@oksbi',
-                amount: '₹3,200.50',
-                reason: 'Geo Mismatch',
-                details: 'Student transacting from college campus hostel Wi-Fi proxy.'
-              },
-              {
-                id: 'APP-8926-Z',
-                ticketId: 'APP-8926-Z',
-                identifier: 'Dev: MAC-99A1',
-                vpa: 'freelance.designer@icici',
-                amount: '₹850.00',
-                reason: 'New Device Login',
-                details: 'Designer upgraded to new laptop for client project delivery.'
-              }
-            ];
-
-            return (
-              <div className="flex-1 bg-[#141313] flex flex-col p-6 overflow-y-auto text-[#e5e2e1] font-mono">
-                {/* Header */}
-                <div className="flex justify-between items-end mb-6 border-b border-white/10 pb-4">
-                  <div>
-                    <h1 className="text-2xl font-bold text-white font-sans tracking-tight">False-Positive Appeals Review Desk</h1>
-                    <p className="text-xs text-[#8e9193] mt-1">{sampleAppeals.length} Pending</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button className="bg-[#2a2a2a] border border-white/10 hover:border-white px-4 py-2 text-xs font-bold uppercase flex items-center gap-2 transition-colors cursor-pointer">
-                      <Filter className="w-3.5 h-3.5" />
-                      Filter
-                    </button>
-                  </div>
+          {activeTab === 'disputes' && (
+            <div className="flex-1 bg-[#141313] flex flex-col p-6 overflow-y-auto text-[#e5e2e1] font-mono">
+              {/* Header */}
+              <div className="flex justify-between items-end mb-6 border-b border-white/10 pb-4">
+                <div>
+                  <h1 className="text-2xl font-bold text-white font-sans tracking-tight">False-Positive Appeals Review Desk</h1>
+                  <p className="text-xs text-[#8e9193] mt-1">{displayAppeals.length} Pending</p>
                 </div>
-
-                {/* Appeals Queue */}
-                <div className="flex flex-col gap-4">
-                  {sampleAppeals.map((a, idx) => (
-                    <div
-                      key={a.id || a.ticketId || idx}
-                      className="bg-[#201f1f] p-4 border border-white/10 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-white/20 transition-colors"
-                    >
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full md:w-3/4 text-xs">
-                        <div>
-                          <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Ticket ID</div>
-                          <div className="text-sm font-bold text-white">{a.id || a.ticketId || `APP-${8924 + idx}-X`}</div>
-                        </div>
-                        <div>
-                          <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Flagged Identifier</div>
-                          <div className="text-xs text-white font-bold">{a.identifier || a.vpa || 'merchant.kirana@paytm'}</div>
-                        </div>
-                        <div>
-                          <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Amount</div>
-                          <div className="text-sm font-bold text-[#00F0A0]">{a.amount?.toString().startsWith('₹') || a.amount?.toString().startsWith('$') ? a.amount : `₹${a.amount || '12,450'}`}</div>
-                        </div>
-                        <div>
-                          <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Reason Code</div>
-                          <div className="text-xs text-white bg-white/5 px-2 py-1 inline-block border border-white/10 rounded-sm">
-                            {a.reason || 'Velocity Spike'}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-2 w-full md:w-auto justify-end">
-                        <button
-                          onClick={() => handleResolveAppeal(a.id || a.ticketId, 'REJECTED')}
-                          className="flex-1 md:flex-none border border-[#FF4B4B] text-[#FF4B4B] hover:bg-[#FF4B4B]/10 px-4 py-2 text-xs font-bold uppercase transition-colors cursor-pointer active:scale-95"
-                        >
-                          Reject
-                        </button>
-                        <button
-                          onClick={() => handleResolveAppeal(a.id || a.ticketId, 'APPROVED')}
-                          className="flex-1 md:flex-none border border-[#10b981] text-[#10b981] hover:bg-[#10b981]/10 px-4 py-2 text-xs font-bold uppercase transition-colors cursor-pointer active:scale-95"
-                        >
-                          Approve
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex gap-2">
+                  <button className="bg-[#2a2a2a] border border-white/10 hover:border-white px-4 py-2 text-xs font-bold uppercase flex items-center gap-2 transition-colors cursor-pointer">
+                    <Filter className="w-3.5 h-3.5" />
+                    Filter
+                  </button>
                 </div>
               </div>
-            );
-          })()}
+
+              {/* Appeals Queue */}
+              <div className="flex flex-col gap-4">
+                {displayAppeals.map((a, idx) => (
+                  <div
+                    key={a.id || a.ticketId || idx}
+                    className="bg-[#201f1f] p-4 border border-white/10 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-white/20 transition-colors"
+                  >
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full md:w-3/4 text-xs">
+                      <div>
+                        <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Ticket ID</div>
+                        <div className="text-sm font-bold text-white">{a.id || a.ticketId || `APP-${8924 + idx}-X`}</div>
+                      </div>
+                      <div>
+                        <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Flagged Identifier</div>
+                        <div className="text-xs text-white font-bold">{a.identifier || a.vpa || 'merchant.kirana@paytm'}</div>
+                      </div>
+                      <div>
+                        <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Amount</div>
+                        <div className="text-sm font-bold text-[#00F0A0]">{a.amount?.toString().startsWith('₹') || a.amount?.toString().startsWith('$') ? a.amount : `₹${a.amount || '12,450'}`}</div>
+                      </div>
+                      <div>
+                        <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Reason Code</div>
+                        <div className="text-xs text-white bg-white/5 px-2 py-1 inline-block border border-white/10 rounded-sm">
+                          {a.reason || 'Velocity Spike'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 w-full md:w-auto justify-end">
+                      <button
+                        onClick={() => handleResolveAppeal(a.id || a.ticketId, 'REJECTED')}
+                        className="flex-1 md:flex-none border border-[#FF4B4B] text-[#FF4B4B] hover:bg-[#FF4B4B]/10 px-4 py-2 text-xs font-bold uppercase transition-colors cursor-pointer active:scale-95"
+                      >
+                        Reject
+                      </button>
+                      <button
+                        onClick={() => handleResolveAppeal(a.id || a.ticketId, 'APPROVED')}
+                        className="flex-1 md:flex-none border border-[#10b981] text-[#10b981] hover:bg-[#10b981]/10 px-4 py-2 text-xs font-bold uppercase transition-colors cursor-pointer active:scale-95"
+                      >
+                        Approve
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* ══════════════════════════════════════════════════════════════
               TAB 4: ROI & LOSS REDUCTION TELEMETRY
@@ -1298,225 +1358,295 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 text-xs">
-                <div className="p-3 bg-[#171E2B] border border-white/[0.08]">
-                  <span className="text-[10px] text-[#e4bdba]">COERCION PROBABILITY</span>
-                  <div className="text-xl font-bold text-[#FF4B4B]">95.4%</div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="p-3 bg-[#171E2B] border border-white/[0.08] text-center">
+                  <div className="text-[10px] text-[#e4bdba]">COERCION PROBABILITY</div>
+                  <div className="text-lg font-bold text-[#FF4B4B]">95.4%</div>
                 </div>
-                <div className="p-3 bg-[#171E2B] border border-white/[0.08]">
-                  <span className="text-[10px] text-[#e4bdba]">DETECTED DIALECT</span>
-                  <div className="text-xl font-bold text-[#00F0A0]">BHOJPURI-HINDI</div>
+                <div className="p-3 bg-[#171E2B] border border-white/[0.08] text-center">
+                  <div className="text-[10px] text-[#e4bdba]">DETECTED DIALECT</div>
+                  <div className="text-lg font-bold text-[#00F0A0]">BHOJPURI-HINDI</div>
                 </div>
-                <div className="p-3 bg-[#171E2B] border border-white/[0.08]">
-                  <span className="text-[10px] text-[#e4bdba]">VOIP HOP COUNT</span>
-                  <div className="text-xl font-bold text-cyan-300">4 PROXIES</div>
+                <div className="p-3 bg-[#171E2B] border border-white/[0.08] text-center">
+                  <div className="text-[10px] text-[#e4bdba]">VOIP PROXY HOPS</div>
+                  <div className="text-lg font-bold text-amber-400">4 PROXIES</div>
                 </div>
               </div>
             </div>
           )}
 
           {/* ══════════════════════════════════════════════════════════════
-              TAB 6: SIM SWAP & IMSI MONITOR
+              TAB 6: SIM SWAP MONITOR
           ══════════════════════════════════════════════════════════════ */}
           {activeTab === 'sim_carrier' && (
             <div className="flex-1 bg-[#10141C] border border-white/[0.08] p-5 flex flex-col gap-4 overflow-y-auto">
               <h2 className="text-sm font-bold text-white uppercase flex items-center gap-2 border-b border-white/[0.08] pb-3">
-                <Radio className="w-4 h-4 text-blue-400" />
-                Telecom SIM Swap &amp; IMSI Anomaly Tracker
+                <Radio className="w-4 h-4 text-[#00D2FF]" />
+                Telecom Carrier SIM Swap &amp; IMSI Telemetry Monitor
               </h2>
 
-              <div className="p-4 bg-[#171E2B] border border-white/[0.08] space-y-2">
-                <span className="text-xs text-[#00F0A0] font-bold uppercase">Active Carrier Feed: Airtel, Jio, Vi</span>
-                <p className="text-xs text-[#e4bdba]">
-                  Monitors real-time SIM card replacements and IMSI resets within the last 48 hours to block SMS OTP hijacking.
-                </p>
+              <div className="space-y-2">
+                {[
+                  { phone: '+91 94775 30475', carrier: 'Airtel India', time: '14 mins ago', swap: 'DETECTED', risk: 'HIGH' },
+                  { phone: '+91 88001 12233', carrier: 'Reliance Jio', time: '1 hour ago', swap: 'DETECTED', risk: 'HIGH' },
+                  { phone: '+91 99112 23344', carrier: 'Vodafone Idea (Vi)', time: '3 hours ago', swap: 'CLEAR', risk: 'LOW' }
+                ].map((s, i) => (
+                  <div key={i} className="p-3 bg-[#171E2B] border border-white/[0.08] flex justify-between items-center text-xs">
+                    <div>
+                      <span className="text-white font-bold block">{s.phone}</span>
+                      <span className="text-[10px] text-[#e4bdba]">{s.carrier} • Last IMSI update: {s.time}</span>
+                    </div>
+                    <span className={`px-2 py-1 text-[10px] font-bold ${
+                      s.swap === 'DETECTED' ? 'bg-[#FF4B4B]/20 text-[#FF4B4B] border border-[#FF4B4B]' : 'bg-[#00F0A0]/20 text-[#00F0A0]'
+                    }`}>
+                      {s.swap === 'DETECTED' ? '⚠️ RECENT SIM SWAP' : '✓ IMSI VERIFIED'}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
           {/* ══════════════════════════════════════════════════════════════
-              TAB 7: I4C NATIONAL ADVISORIES
+              TAB 7: I4C ADVISORIES
           ══════════════════════════════════════════════════════════════ */}
           {activeTab === 'advisories' && (
             <div className="flex-1 bg-[#10141C] border border-white/[0.08] p-5 flex flex-col gap-4 overflow-y-auto">
               <h2 className="text-sm font-bold text-white uppercase flex items-center gap-2 border-b border-white/[0.08] pb-3">
                 <BellRing className="w-4 h-4 text-amber-400" />
-                I4C &amp; RBI National Security Advisories (2026)
+                I4C National Cybersecurity Advisories (2026)
               </h2>
 
-              <div className="space-y-2 text-xs">
-                <div className="p-3 bg-[#171E2B] border border-white/[0.08]">
-                  <strong className="text-white">ADV-2026-08:</strong> Coercive Digital Arrest Video Calls impersonating CBI &amp; Mumbai Police.
-                </div>
-                <div className="p-3 bg-[#171E2B] border border-white/[0.08]">
-                  <strong className="text-white">ADV-2026-04:</strong> Fake Electricity Bill Power-Cut APKs sent via WhatsApp.
-                </div>
+              <div className="space-y-3">
+                {[
+                  { title: 'Advisory #2026-08: Wave of Fake Supreme Court Digital Arrest Calls', date: 'Aug 2026', severity: 'CRITICAL' },
+                  { title: 'Advisory #2026-07: Malicious WhatsApp APKs Impersonating State Electricity Boards', date: 'Aug 2026', severity: 'HIGH' },
+                  { title: 'Advisory #2026-06: Mule Bank Accounts Rented via Telegram Freelancing Channels', date: 'Jul 2026', severity: 'HIGH' }
+                ].map((adv, i) => (
+                  <div key={i} className="p-3 bg-[#171E2B] border border-white/[0.08] text-xs space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-white font-bold">{adv.title}</span>
+                      <span className="text-[#FF4B4B] font-bold text-[10px]">{adv.severity}</span>
+                    </div>
+                    <p className="text-[11px] text-[#e4bdba]">Circular published by Ministry of Home Affairs, Cyber &amp; Information Security Division.</p>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
         </main>
 
-        {/* ── RIGHT INSPECTOR PANEL (W-80 DOCKED) ── */}
-        <aside className="fixed right-0 top-16 h-[calc(100vh-64px)] w-80 bg-[#10141C] border-l border-white/[0.08] flex flex-col z-40">
+        {/* ── RIGHT DOCKED INSPECTOR PANEL (W-80) ── */}
+        <aside className="w-80 border-l border-white/[0.08] bg-[#10141C] flex flex-col shrink-0">
           
-          {/* Dual Tabs */}
-          <div className="flex w-full border-b border-white/[0.08] bg-[#171E2B]">
+          {/* Tabs */}
+          <div className="flex border-b border-white/[0.08] bg-[#0A0D14]">
             <button
               onClick={() => setInspectorMode('UPI')}
-              className={`flex-1 py-2 text-[11px] uppercase text-center font-bold transition-all cursor-pointer ${
-                inspectorMode === 'UPI' ? 'bg-[#10141C] text-[#FF4B4B] border-b-2 border-[#FF4B4B]' : 'text-[#e4bdba] hover:bg-[#10141C]'
+              className={`flex-1 py-2.5 text-center text-xs font-bold cursor-pointer transition-all ${
+                inspectorMode === 'UPI' ? 'bg-[#10141C] text-[#00F0A0] border-b-2 border-[#00F0A0]' : 'text-[#e4bdba] hover:text-white'
               }`}
             >
               ⚡ UPI Stream
             </button>
             <button
               onClick={() => setInspectorMode('BANK')}
-              className={`flex-1 py-2 text-[11px] uppercase text-center font-bold transition-all cursor-pointer ${
-                inspectorMode === 'BANK' ? 'bg-[#10141C] text-[#00F0A0] border-b-2 border-[#00F0A0]' : 'text-[#e4bdba] hover:bg-[#10141C]'
+              className={`flex-1 py-2.5 text-center text-xs font-bold cursor-pointer transition-all ${
+                inspectorMode === 'BANK' ? 'bg-[#10141C] text-[#00F0A0] border-b-2 border-[#00F0A0]' : 'text-[#e4bdba] hover:text-white'
               }`}
             >
               🏦 Bank A/C + IFSC
             </button>
           </div>
 
-          <div className="p-3 flex-1 overflow-y-auto flex flex-col gap-4">
+          <div className="flex-1 p-3 overflow-y-auto space-y-3">
             
-            {/* Interception Card */}
-            <div className="bg-[#10141C] border border-[#FF4B4B] relative">
-              <div className="absolute top-0 left-0 w-1 h-full bg-[#FF4B4B]" />
-              <div className="p-3 pl-4 flex flex-col gap-2">
-                <div className="flex justify-between items-start">
-                  <span className="px-1.5 py-0.5 bg-[#FF4B4B]/20 text-[#FF4B4B] text-[10px] border border-[#FF4B4B]/50 uppercase font-bold">
-                    95% CRITICAL
-                  </span>
-                  <span className="text-[10px] text-[#e4bdba]">T-MINUS 12s</span>
-                </div>
+            {/* 95% Threat Card */}
+            <div className="p-3 bg-[#FF4B4B]/10 border border-[#FF4B4B] space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-bold text-[#FF4B4B] flex items-center gap-1">
+                  <AlertOctagon className="w-4 h-4" />
+                  95% CRITICAL
+                </span>
+                <span className="text-[10px] text-white bg-[#FF4B4B] px-1.5 py-0.2 font-bold text-black">
+                  T-MINUS 12s
+                </span>
+              </div>
 
-                <div className="text-[12px] text-white break-all space-y-0.5 font-mono">
-                  {inspectorMode === 'UPI' ? (
-                    <>
-                      <div>vpa: <span className="text-[#FF4B4B] font-bold">{inspectorVpa}</span></div>
-                      <div>amt: ₹ 4,50,000</div>
-                      <div>dev: REDMI_NOTE_12_MULE</div>
-                    </>
-                  ) : (
-                    <>
-                      <div>acc: <span className="text-[#00F0A0] font-bold">{inspectorAcc}</span></div>
-                      <div>ifsc: <span className="text-[#00F0A0] font-bold">{inspectorIfsc}</span></div>
-                      <div>branch: SBI Jamtara Sadar</div>
-                    </>
-                  )}
+              {inspectorMode === 'UPI' ? (
+                <div className="space-y-1 text-xs">
+                  <div className="text-white font-mono font-bold">{inspectorVpa}</div>
+                  <div className="text-[#00F0A0] font-bold">amt: ₹ 4,50,000</div>
+                  <div className="text-[10px] text-[#e4bdba]">dev: REDMI_NOTE_12_MULE</div>
                 </div>
+              ) : (
+                <div className="space-y-1 text-xs">
+                  <div className="text-white font-mono font-bold">acc: {inspectorAcc}</div>
+                  <div className="text-[#00F0A0] font-bold">ifsc: {inspectorIfsc}</div>
+                  <div className="text-[10px] text-[#e4bdba]">branch: SBI Jamtara Sadar</div>
+                </div>
+              )}
 
-                <div className="mt-1">
-                  <span className="inline-block px-2 py-0.5 bg-[#171E2B] border border-white/[0.08] text-white text-[10px] uppercase font-bold">
-                    TAG: DIGITAL ARREST
-                  </span>
-                </div>
+              <div className="text-[10px] bg-black p-1.5 border border-white/[0.08] text-[#e4bdba]">
+                TAG: DIGITAL ARREST (POLICE COERCION)
+              </div>
+
+              <div className="flex gap-2 pt-1">
+                <button
+                  onClick={() => {
+                    setActionSuccess(`IDENTIFIER ${inspectorMode === 'UPI' ? inspectorVpa : inspectorAcc} PERMANENTLY BLOCKED ACROSS UPI GATEWAYS`);
+                    setTimeout(() => setActionSuccess(''), 4000);
+                  }}
+                  className="flex-1 py-1.5 bg-[#FF4B4B] hover:bg-rose-600 text-black font-bold text-[11px] uppercase cursor-pointer"
+                >
+                  BLOCK VPA INSTANTLY
+                </button>
               </div>
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-2">
-              <button
-                onClick={() => {
-                  setActionSuccess(`VPA ${inspectorVpa} permanently blacklisted across all Indian UPI gateways.`);
-                  setTimeout(() => setActionSuccess(''), 3000);
-                }}
-                className="w-full py-2 bg-transparent border border-[#FF4B4B] text-[#FF4B4B] text-xs uppercase hover:bg-[#FF4B4B] hover:text-black font-bold transition-all cursor-pointer"
-              >
-                BLOCK VPA INSTANTLY
-              </button>
-
-              <button
-                onClick={() => {
-                  setActionSuccess('1930 National Cybercrime Dossier dispatched to I4C Incident Portal.');
-                  setTimeout(() => setActionSuccess(''), 3000);
-                }}
-                className="w-full py-2 bg-[#171E2B] border border-white/[0.08] text-white text-xs uppercase hover:bg-white/[0.08] font-bold transition-all cursor-pointer"
-              >
-                COMPILE 1930 DOSSIER
-              </button>
-            </div>
-
-            <div className="h-px w-full bg-white/[0.08]" />
 
             {/* Audio Forensics Module */}
-            <div className="flex flex-col gap-2 mt-auto pb-2">
-              <div className="text-[11px] text-[#e4bdba] flex items-center gap-1.5 uppercase font-bold">
-                <Volume2 className="w-4 h-4 text-purple-400" />
-                Audio Forensics Sync
+            <div className="p-3 bg-[#171E2B] border border-white/[0.08] space-y-2.5">
+              <div className="flex justify-between items-center border-b border-white/[0.08] pb-1.5">
+                <span className="text-xs font-bold text-purple-400 flex items-center gap-1.5">
+                  <Volume2 className="w-3.5 h-3.5" />
+                  Audio Forensics Engine
+                </span>
+                <span className="text-[9px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 border border-purple-500/30">
+                  LIVE WAVEFORM
+                </span>
               </div>
 
-              {/* Simulated Waveform */}
-              <div className="h-14 w-full bg-[#171E2B] border border-white/[0.08] flex items-center justify-center p-2">
-                <div className="flex items-end gap-[3px] h-full w-full opacity-80">
-                  <div className="w-1.5 bg-[#e4bdba] h-[20%]" />
-                  <div className="w-1.5 bg-[#e4bdba] h-[40%]" />
-                  <div className="w-1.5 bg-[#00F0A0] h-[80%] animate-pulse" />
-                  <div className="w-1.5 bg-[#e4bdba] h-[30%]" />
-                  <div className="w-1.5 bg-[#FF4B4B] h-[90%] animate-pulse" />
-                  <div className="w-1.5 bg-[#00D2FF] h-[100%] animate-pulse" />
-                  <div className="w-1.5 bg-[#e4bdba] h-[50%]" />
-                  <div className="w-1.5 bg-[#00F0A0] h-[70%]" />
-                  <div className="w-1.5 bg-[#FF4B4B] h-[60%]" />
+              {/* Animated Acoustic Waveform */}
+              <div className="h-12 bg-black border border-white/[0.08] flex items-center justify-center gap-1 px-2">
+                {[30, 60, 90, 45, 80, 100, 65, 40, 85, 95, 55, 30, 75, 50, 90, 40].map((h, i) => (
+                  <div
+                    key={i}
+                    className="w-1 bg-[#00F0A0] rounded-full animate-pulse"
+                    style={{ height: `${h}%`, animationDelay: `${i * 0.08}s` }}
+                  />
+                ))}
+              </div>
+
+              <div className="text-[10px] space-y-1 text-[#e4bdba]">
+                <div className="flex justify-between">
+                  <span>LANG: <strong className="text-white">HIN (84%)</strong></span>
+                  <span>DIALECT: <strong className="text-[#00F0A0]">BHOJPURI</strong></span>
+                </div>
+                <div className="flex justify-between">
+                  <span>SPEAKER MATCH:</span>
+                  <span className="text-[#FF4B4B] font-bold">KNOWN MULE (JMT-04)</span>
                 </div>
               </div>
 
-              {/* 6 Regional Language Audio Triggers */}
-              <div className="space-y-1 mt-1">
-                <span className="text-[10px] text-[#e4bdba]">Play Regional Audio Warning:</span>
-                <div className="grid grid-cols-3 gap-1">
+              {/* Regional Voice Warning Triggers */}
+              <div className="pt-2 border-t border-white/[0.08]">
+                <span className="text-[10px] text-[#e4bdba] block uppercase mb-1.5">
+                  Play ElevenLabs Regional Warning:
+                </span>
+                <div className="grid grid-cols-3 gap-1.5">
                   {[
-                    { lang: 'hi', label: 'HI (Hindi)' },
-                    { lang: 'bn', label: 'BN (Bengali)' },
-                    { lang: 'or', label: 'OR (Odia)' },
-                    { lang: 'te', label: 'TE (Telugu)' },
-                    { lang: 'ta', label: 'TA (Tamil)' },
-                    { lang: 'en', label: 'EN (English)' }
-                  ].map(item => (
+                    { code: 'hi', label: 'HI (Hindi)' },
+                    { code: 'bn', label: 'BN (Bengali)' },
+                    { code: 'or', label: 'OR (Odia)' },
+                    { code: 'te', label: 'TE (Telugu)' },
+                    { code: 'ta', label: 'TA (Tamil)' },
+                    { code: 'en', label: 'EN (English)' }
+                  ].map((lang) => (
                     <button
-                      key={item.lang}
-                      onClick={() => playRegionalVoiceWarning('upi', item.lang)}
-                      className="py-1 px-1 bg-[#171E2B] hover:bg-[#00F0A0] hover:text-black border border-white/[0.08] text-[10px] text-white transition-all cursor-pointer text-center font-bold"
+                      key={lang.code}
+                      onClick={() => {
+                        playRegionalVoiceWarning('upi', lang.code);
+                        setActionSuccess(`Broadcasting ${lang.label} AI Voice Warning`);
+                        setTimeout(() => setActionSuccess(''), 3000);
+                      }}
+                      className="py-1 bg-black hover:bg-purple-950/40 border border-purple-500/30 text-purple-300 text-[10px] font-bold cursor-pointer transition-all active:scale-95"
                     >
-                      {item.label}
+                      {lang.label}
                     </button>
                   ))}
                 </div>
               </div>
+
             </div>
 
           </div>
+
         </aside>
 
       </div>
 
-      {/* ── MODAL: ADD RECORD ── */}
+      {/* ── MODAL: ADD THREAT RECORD ── */}
       {showAddThreatModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-fade-in">
-          <form onSubmit={handleAddNewThreat} className="w-full max-w-md bg-[#10141C] border border-white/[0.12] p-6 space-y-4 shadow-2xl">
-            <div className="flex justify-between items-center border-b border-white/[0.08] pb-3">
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-[#10141C] border border-white/[0.1] p-5 space-y-4 shadow-2xl">
+            <div className="flex justify-between items-center border-b border-white/[0.08] pb-2">
               <h3 className="text-sm font-bold text-white uppercase flex items-center gap-2">
-                <PlusCircle className="w-4 h-4 text-[#00F0A0]" /> Add Blacklist Record
+                <PlusCircle className="w-4 h-4 text-[#00F0A0]" />
+                Add Record to Threat Registry
               </h3>
-              <button type="button" onClick={() => setShowAddThreatModal(false)} className="text-[#e4bdba] hover:text-white">
-                <XCircle className="w-5 h-5" />
+              <button onClick={() => setShowAddThreatModal(false)} className="text-[#e4bdba] hover:text-white cursor-pointer">
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <input
-              type="text"
-              required
-              value={newThreatIdentifier}
-              onChange={(e) => setNewThreatIdentifier(e.target.value)}
-              placeholder="UPI ID, Phone (+91), or Bank A/C..."
-              className="w-full bg-[#171E2B] border border-white/[0.08] p-2.5 text-xs text-white focus:outline-none focus:border-[#00F0A0]"
-            />
-            <button type="submit" className="w-full py-2.5 bg-[#00F0A0] text-black font-bold text-xs uppercase cursor-pointer">
-              Save to Registry
-            </button>
-          </form>
+
+            <form onSubmit={handleAddNewThreat} className="space-y-3">
+              <div>
+                <label className="text-[10px] uppercase text-[#e4bdba] block mb-1">Identifier (VPA, Phone, or Bank A/C)</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. scammer.officer@oksbi or +919477530475"
+                  value={newThreatIdentifier}
+                  onChange={(e) => setNewThreatIdentifier(e.target.value)}
+                  className="w-full bg-[#171E2B] border border-white/[0.08] p-2.5 text-xs text-white focus:outline-none focus:border-[#00F0A0]"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] uppercase text-[#e4bdba] block mb-1">Threat Category</label>
+                <select
+                  value={newThreatCategory}
+                  onChange={(e) => setNewThreatCategory(e.target.value)}
+                  className="w-full bg-[#171E2B] border border-white/[0.08] p-2.5 text-xs text-white focus:outline-none focus:border-[#00F0A0]"
+                >
+                  <option value="DIGITAL_ARREST">Digital Arrest / Fake Police Coercion</option>
+                  <option value="MULE_ACCOUNT">Compromised Mule Account</option>
+                  <option value="ELECTRICITY_BILL">State Discom Power Cut SMS</option>
+                  <option value="PART_TIME_JOB">Telegram Rating / Part-Time Job Scam</option>
+                  <option value="CUSTOMS_PARCEL">Customs Airport Parcel Extortion</option>
+                  <option value="SEXTO">Sextortion / Video Call Blackmail</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[10px] uppercase text-[#e4bdba] block mb-1">Investigative Case Details</label>
+                <textarea
+                  rows={3}
+                  placeholder="FIR # / Modus operandi notes..."
+                  value={newThreatDetails}
+                  onChange={(e) => setNewThreatDetails(e.target.value)}
+                  className="w-full bg-[#171E2B] border border-white/[0.08] p-2.5 text-xs text-white focus:outline-none focus:border-[#00F0A0]"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddThreatModal(false)}
+                  className="px-4 py-2 border border-white/[0.08] text-xs text-[#e4bdba] hover:bg-white/5 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-[#00F0A0] text-black font-bold text-xs uppercase cursor-pointer hover:bg-[#00e296]"
+                >
+                  Confirm &amp; Broadcast
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
