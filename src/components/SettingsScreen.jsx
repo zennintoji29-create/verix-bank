@@ -220,11 +220,12 @@ export default function SettingsScreen({ onBack, user, onLanguageChange, current
                 </button>
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
                   { id: 'voice', label: currentLang === 'hi' ? 'AI वॉयस' : (currentLang === 'bn' ? 'AI ভয়েস' : 'AI Voice') },
                   { id: 'beep', label: currentLang === 'hi' ? 'सायरन बीप' : (currentLang === 'bn' ? 'সাইরেন' : 'Siren Beep') },
-                  { id: 'both', label: currentLang === 'hi' ? 'दोनों' : (currentLang === 'bn' ? 'উভয়ই' : 'Both (Voice+Beep)') }
+                  { id: 'both', label: currentLang === 'hi' ? 'दोनों (वॉइस+बीप)' : (currentLang === 'bn' ? 'উভয়ই' : 'Both (Voice+Beep)') },
+                  { id: 'off', label: currentLang === 'hi' ? 'बंद (Mute)' : (currentLang === 'bn' ? 'বন্ধ (Mute)' : 'OFF (Mute)') }
                 ].map((opt) => {
                   const isActive = soundAlertMode === opt.id;
                   return (
@@ -242,11 +243,13 @@ export default function SettingsScreen({ onBack, user, onLanguageChange, current
               </div>
 
               <p className="text-[11px] text-[#8A8F9E] leading-tight px-1 font-mono">
-                {soundAlertMode === 'voice' 
-                  ? `✓ AI will speak in ${languages.find(l => l.code === currentLang)?.label || 'English'}.` 
-                  : (soundAlertMode === 'beep' 
-                      ? '✓ Multi-tone emergency siren alarm will sound on scams.' 
-                      : `✓ Siren alarm + Spoken warning in ${languages.find(l => l.code === currentLang)?.label || 'English'}.`)}
+                {soundAlertMode === 'off'
+                  ? '✕ Audio warnings and sirens are completely muted.'
+                  : (soundAlertMode === 'voice' 
+                      ? `✓ AI will speak in ${languages.find(l => l.code === currentLang)?.label || 'English'}.` 
+                      : (soundAlertMode === 'beep' 
+                          ? '✓ Multi-tone emergency siren alarm will sound on scams.' 
+                          : `✓ Siren alarm + Spoken warning in ${languages.find(l => l.code === currentLang)?.label || 'English'}.`))}
               </p>
             </div>
           </div>

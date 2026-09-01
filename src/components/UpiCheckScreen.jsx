@@ -791,25 +791,26 @@ export default function UpiCheckScreen({ onBack, backendUrl, user, initialPreset
         </button>
         <h2 className="text-[14px] font-bold text-[#F5F6FA] font-mono">Pre-Payment Sentinel</h2>
         
-        {/* Hidden Direct Gallery File Input */}
+        {/* Hidden Direct Gallery File Input for Android WebView */}
         <input 
           type="file" 
+          id="direct-gallery-qr-input"
           ref={directGalleryRef} 
           accept="image/*" 
           onChange={handleDirectGalleryUpload} 
-          className="hidden" 
+          style={{ position: 'absolute', opacity: 0, width: '1px', height: '1px', pointerEvents: 'none', zIndex: -1 }}
         />
 
         <div className="flex items-center gap-1.5">
-          <button
+          <label
+            htmlFor="direct-gallery-qr-input"
             onClick={() => directGalleryRef.current?.click()}
-            disabled={decodingGallery}
             title="Upload QR Image from Gallery"
             className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full border border-[#262B3A] text-[#F5F6FA] bg-[#151823] active:scale-90 transition-all cursor-pointer hover:bg-[#1C202E]"
           >
             {decodingGallery ? <RefreshCw className="w-3.5 h-3.5 text-[#3ECF7A] animate-spin" /> : <Upload className="w-3.5 h-3.5 text-[#3ECF7A] stroke-[2.5]" />}
             <span className="hidden sm:inline">Upload QR</span>
-          </button>
+          </label>
           <button
             onClick={() => setShowQrModal(true)}
             title="Scan QR Code"

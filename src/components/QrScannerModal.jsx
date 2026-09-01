@@ -323,20 +323,20 @@ export default function QrScannerModal({ onClose, onScanSuccess, lang = 'en' }) 
             </div>
           </div>
 
-          {/* Hidden File Input with Ref for 100% Guaranteed Trigger */}
+          {/* Hidden File Input styled for 100% Guaranteed Android WebView Trigger */}
           <input 
             type="file" 
+            id="qr-modal-gallery-input"
             ref={fileInputRef}
             accept="image/*" 
             onChange={handleGalleryUpload} 
-            className="hidden" 
+            style={{ position: 'absolute', opacity: 0, width: '1px', height: '1px', pointerEvents: 'none', zIndex: -1 }}
           />
 
-          {/* Upload UPI QR from Gallery Button */}
-          <button
-            type="button"
+          {/* Upload UPI QR from Gallery Button / Label */}
+          <label
+            htmlFor="qr-modal-gallery-input"
             onClick={() => fileInputRef.current?.click()}
-            disabled={isDecodingFile}
             className="btn-tier-1 w-full py-3.5 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_16px_rgba(255,255,255,0.15)] active:scale-[0.98]"
           >
             {isDecodingFile ? (
@@ -345,7 +345,7 @@ export default function QrScannerModal({ onClose, onScanSuccess, lang = 'en' }) 
               <Upload className="w-4 h-4 text-black" />
             )}
             <span>{isDecodingFile ? 'Decoding QR Code...' : 'Upload UPI QR from Gallery'}</span>
-          </button>
+          </label>
 
           {/* Demo Scenario Test Buttons */}
           <div className="flex gap-2.5 pt-1 border-t border-[#2A2A2E]">

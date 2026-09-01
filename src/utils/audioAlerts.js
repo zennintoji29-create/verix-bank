@@ -79,9 +79,45 @@ function createEmergencyBeepDataUri() {
 }
 
 /**
+ * Check if sound alert is allowed by user settings
+ */
+export function isSoundAlertEnabled() {
+  try {
+    const soundMode = localStorage.getItem('verix_alert_sound_mode');
+    const seniorMode = localStorage.getItem('verix_senior_citizen_mode');
+    if (soundMode === 'off' || soundMode === 'none' || soundMode === 'muted' || soundMode === 'disabled') {
+      return false;
+    }
+    if (seniorMode === 'false' && soundMode === 'off') {
+      return false;
+    }
+    return true;
+  } catch (e) {
+    return true;
+  }
+}
+
+/**
+ * Stop any currently playing audio alert or speech
+ */
+export function stopAllAlerts() {
+  try {
+    if (currentPlayingAudio) {
+      currentPlayingAudio.pause();
+      currentPlayingAudio.currentTime = 0;
+      currentPlayingAudio = null;
+    }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  } catch (e) {}
+}
+
+/**
  * Play Guaranteed High-Audibility Scam Alert Siren
  */
 export function playThreatSiren() {
+  if (!isSoundAlertEnabled()) return;
   unlockAudioContext();
 
   try {
@@ -139,6 +175,7 @@ export function playThreatSiren() {
  * Seamlessly falls back to Web SpeechSynthesis if needed.
  */
 export function playRegionalVoiceWarning(category = 'upi', lang = 'en') {
+  if (!isSoundAlertEnabled()) return;
   unlockAudioContext();
 
   const primaryAudioPath = `/audio/alert_${lang}.mp3`;
@@ -173,6 +210,7 @@ export function playRegionalVoiceWarning(category = 'upi', lang = 'en') {
 }
 
 function fallbackToSpeechSynthesis(category, lang) {
+  if (!isSoundAlertEnabled()) return;
   const speechMap = {
     upi: {
       hi: 'सावधान! यह यूपीआई आईडी साइबर फ्रॉड के लिए फ्लैग की गई है। कोई भी भुगतान न करें।',
@@ -185,9 +223,9 @@ function fallbackToSpeechSynthesis(category, lang) {
     call: {
       hi: 'सावधान! यह कॉल एक संदिग्ध डिजिटल अरेस्ट या पुलिस फ्रॉड हो सकती है। तुरंत कॉल काटें।',
       bn: 'সতর্কতা! এই কলটি একটি ভুয়ো পুলিশ বা ডিজিটাল গ্রেফতারি প্রতারণা। এখনই কলটি কাটুন।',
-      or: 'ସତର୍କତା! ଏହି କଲ ଏକ ଠକେଇ ହୋଇପାରେ। ତୁରନ୍ତ କଲ୍ କାଟନ୍ତୁ।',
+      or: 'ସତର୍କତା! ଏହି କଲ ଏକ ଠକେଇ ହୋଇପারে। ତୁରନ୍ତ କଲ୍ କାଟନ୍ତୁ।',
       te: 'హెచ్చరిక! ఈ కాల్ నకిలీ పోలీసు లేదా సైబర్ మోసం. వెంటనే కాల్ ముగించండి.',
-      ta: 'எச்சரிக்கை! இந்த அழைப்பு போली காவல்துறை மோசடி. உடனே அழைப்பை துண்டிக்கவும்.',
+      ta: 'எச்சரிக்கை! இந்த அழைப்பு போலி காவல்துறை மோசடி. உடனே அழைப்பை துண்டிக்கவும்.',
       en: 'Warning! This call is detected as suspected Digital Arrest extortion. Disconnect call immediately.'
     }
   };
@@ -224,10 +262,20 @@ function fallbackToSpeechSynthesis(category, lang) {
 }
 
 /**
- * Combined Configurable Trigger: Siren Beep vs AI Voice vs Both
+ * Combined Configurable Trigger: Siren Beep vs AI Voice vs Both vs OFF
  */
 export function triggerThreatAlarmAndSpeech(category = 'upi', lang = 'en') {
-  const soundMode = localStorage.getItem('verix_alert_sound_mode') || 'both'; // 'voice' | 'beep' | 'both'
+  if (!isSoundAlertEnabled()) {
+    stopAllAlerts();
+    return;
+  }
+
+  const soundMode = localStorage.getItem('verix_alert_sound_mode') || 'both';
+
+  if (soundMode === 'off' || soundMode === 'none' || soundMode === 'muted' || soundMode === 'disabled') {
+    stopAllAlerts();
+    return;
+  }
 
   if (soundMode === 'beep') {
     playThreatSiren();
