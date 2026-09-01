@@ -256,7 +256,19 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
 
   // Navigation tabs: 'threat_heatmap' | 'database_search' | 'disputes' | 'statistics_impact' | 'audio_lab' | 'sim_carrier' | 'advisories'
   const [activeTab, setActiveTab] = useState('threat_heatmap');
-  const [appeals, setAppeals] = useState(SEED_APPEALS);
+  
+  // Initialize appeals with localStorage persistence
+  const [appeals, setAppeals] = useState(() => {
+    try {
+      const saved = localStorage.getItem('verix_bank_appeals');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return SEED_APPEALS;
+  });
+
   const [threats, setThreats] = useState(() => Array.isArray(INITIAL_THREAT_RECORDS) ? INITIAL_THREAT_RECORDS : []);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -303,7 +315,6 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
   const selectedState = INDIA_STATES_HEATMAP_DATA.find(s => s.id === selectedStateId) || INDIA_STATES_HEATMAP_DATA[0];
 
   const fetchPortalData = async () => {
-    setLoading(true);
     try {
       const base = backendUrl || 'https://fruadsih.onrender.com';
       const [appealsRes, threatsRes] = await Promise.all([
@@ -313,62 +324,122 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
 
       if (appealsRes && appealsRes.ok) {
         const data = await appealsRes.json();
-        if (Array.isArray(data.data) && data.data.length > 0) {
-          setAppeals(data.data);
+        const incomingAppeals = Array.isArray(data.appeals) ? data.appeals : (Array.isArray(data.data) ? data.data : []);
+        
+        if (incomingAppeals.length > 0) {
+          setAppeals(prev => {
+            const map = new Map();
+            // Seed with existing local items (preserving local resolutions)
+            prev.forEach(item => {
+              const key = item.ticketId || item.appealId || item.id;
+              if (key) map.set(key, item);
+            });
+
+            // Merge incoming from backend
+            incomingAppeals.forEach(inc => {
+              const id = inc.appealId || inc.ticketId || inc.id;
+              if (!id) return;
+              const existing = map.get(id);
+              
+              // If already locally resolved, preserve local status unless backend confirms
+              if (existing && existing.status !== 'PENDING' && inc.status === 'PENDING_REVIEW') {
+                return;
+              }
+
+              const statusNormalized = (inc.status === 'APPROVED_WHITELISTED' || inc.status === 'APPROVED')
+                ? 'APPROVED'
+                : (inc.status === 'REJECTED' ? 'REJECTED' : 'PENDING');
+
+              map.set(id, {
+                id,
+                ticketId: id,
+                identifier: inc.vpa ? `VPA: ${inc.vpa}` : (inc.identifier || 'Flagged Identifier'),
+                vpa: inc.vpa || inc.identifier || 'Unknown VPA',
+                amount: inc.amount ? (inc.amount.toString().startsWith('₹') ? inc.amount : `₹${Number(inc.amount).toLocaleString('en-IN')}`) : '₹12,450.00',
+                reason: inc.reason || 'Velocity Spike',
+                details: inc.evidenceDescription || inc.details || 'Dispute submitted by citizen via mobile app.',
+                status: statusNormalized,
+                timestamp: inc.submittedAt ? new Date(inc.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (existing?.timestamp || 'Recent'),
+                resolvedBy: inc.resolvedBy || (statusNormalized !== 'PENDING' ? (existing?.resolvedBy || 'Compliance Officer') : null),
+                resolvedAt: inc.resolvedAt ? new Date(inc.resolvedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (existing?.resolvedAt || null)
+              });
+            });
+
+            const merged = Array.from(map.values());
+            try {
+              localStorage.setItem('verix_bank_appeals', JSON.stringify(merged));
+            } catch (e) {}
+            return merged;
+          });
         }
       }
+
       if (threatsRes && threatsRes.ok) {
         const data = await threatsRes.json();
-        if (Array.isArray(data.data) && data.data.length > 0) {
-          setThreats(data.data);
+        const incomingThreats = Array.isArray(data.data) ? data.data : (Array.isArray(data.threats) ? data.threats : []);
+        if (incomingThreats.length > 0) {
+          setThreats(incomingThreats);
         }
       }
     } catch (e) {
-      console.warn('Backend sync failed, using cached intelligence data:', e);
-    } finally {
-      setLoading(false);
+      console.warn('Backend sync warning:', e);
     }
   };
 
+  // Run on mount and poll every 5 seconds for live real-time trigger from mobile app
   useEffect(() => {
     fetchPortalData();
+    const interval = setInterval(fetchPortalData, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleResolveAppeal = async (appealId, decision) => {
+    const resolutionBackend = decision === 'APPROVED' ? 'APPROVED_WHITELISTED' : 'REJECTED';
+    const resolutionTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    // 1. Instantly update React state & persist in localStorage
+    const updated = appeals.map(a => {
+      if ((a.appealId || a.ticketId || a.id) === appealId) {
+        return { 
+          ...a, 
+          status: decision, 
+          resolvedAt: resolutionTime,
+          resolvedBy: loginForm.fullName
+        };
+      }
+      return a;
+    });
+
+    setAppeals(updated);
+    try {
+      localStorage.setItem('verix_bank_appeals', JSON.stringify(updated));
+    } catch (e) {}
+
+    setActionSuccess(`Appeal ${appealId} marked as ${decision} & moved to Resolution History!`);
+    setTimeout(() => setActionSuccess(''), 3500);
+    setSelectedTicket(null);
+
+    // 2. Broadcast resolution to backend API so Mobile App unblocks immediately
     try {
       const base = backendUrl || 'https://fruadsih.onrender.com';
-      fetch(`${base}/api/v1/institution/appeals/${appealId}/resolve`, {
+      await fetch(`${base}/api/v1/institution/appeals/${appealId}/resolve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          resolution: resolutionBackend,
           status: decision,
           reviewerNotes: `Reviewed and resolved by Nodal Officer ${loginForm.fullName}`,
+          officerId: loginForm.fullName,
           resolvedBy: loginForm.fullName
         })
-      }).catch(() => null);
-
-      setAppeals(prev => prev.map(a => {
-        if ((a.appealId || a.ticketId || a.id) === appealId) {
-          return { 
-            ...a, 
-            status: decision, 
-            resolvedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-            resolvedBy: loginForm.fullName
-          };
-        }
-        return a;
-      }));
-
-      setActionSuccess(`Appeal ${appealId} marked as ${decision} & moved to Resolution History!`);
-      setTimeout(() => setActionSuccess(''), 3500);
-      setSelectedTicket(null);
+      });
     } catch (e) {
-      alert('Error updating appeal: ' + e.message);
+      console.warn('Backend resolution sync completed locally.');
     }
   };
 
   const handleReopenAppeal = (appealId) => {
-    setAppeals(prev => prev.map(a => {
+    const updated = appeals.map(a => {
       if ((a.appealId || a.ticketId || a.id) === appealId) {
         return {
           ...a,
@@ -378,7 +449,13 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
         };
       }
       return a;
-    }));
+    });
+
+    setAppeals(updated);
+    try {
+      localStorage.setItem('verix_bank_appeals', JSON.stringify(updated));
+    } catch (e) {}
+
     setActionSuccess(`Appeal ${appealId} restored to Pending Queue!`);
     setTimeout(() => setActionSuccess(''), 3000);
   };
@@ -401,7 +478,12 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
       resolvedAt: null
     };
 
-    setAppeals([newAppeal, ...appeals]);
+    const updated = [newAppeal, ...appeals];
+    setAppeals(updated);
+    try {
+      localStorage.setItem('verix_bank_appeals', JSON.stringify(updated));
+    } catch (e) {}
+
     setShowSubmitAppealModal(false);
     setNewAppealVpa('');
     setNewAppealAmount('');
@@ -409,6 +491,22 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
     setAppealsSubTab('PENDING');
     setActionSuccess(`Appeal ticket ${ticketId} created and added to Pending Queue!`);
     setTimeout(() => setActionSuccess(''), 3500);
+
+    // Also send to backend
+    try {
+      const base = backendUrl || 'https://fruadsih.onrender.com';
+      fetch(`${base}/api/v1/institution/appeals`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ticketId,
+          vpa: newAppealVpa,
+          amount: Number(newAppealAmount.replace(/[^0-9.]/g, '')) || 5000,
+          reason: newAppealReason,
+          evidenceDescription: newAppealDetails
+        })
+      }).catch(() => null);
+    } catch (e) {}
   };
 
   const handleAddNewThreat = (e) => {
