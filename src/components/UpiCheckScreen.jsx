@@ -178,9 +178,30 @@ export default function UpiCheckScreen({ onBack, backendUrl, user, initialPreset
 
       // 2. Real-time Live Backend Polling for Ticket Resolution
       if (ticketId) {
+        const base = backendUrl || 'https://fruadsih.onrender.com';
         pollInterval = setInterval(async () => {
           try {
-            const res = await fetch(`${backendUrl}/api/v1/institution/appeals/${ticketId}`, { cache: 'no-store' });
+            // Check local storage resolution first (for instant cross-tab / same browser testing)
+            try {
+              const localAppeals = JSON.parse(localStorage.getItem('verix_bank_appeals') || '[]');
+              const matched = localAppeals.find(a => (a.ticketId || a.id || a.appealId) === ticketId);
+              if (matched) {
+                if (matched.status === 'APPROVED' || matched.status === 'APPROVED_WHITELISTED') {
+                  clearInterval(pollInterval);
+                  clearInterval(timerInterval);
+                  setAdminReviewState('approved');
+                  return;
+                } else if (matched.status === 'REJECTED') {
+                  clearInterval(pollInterval);
+                  clearInterval(timerInterval);
+                  setAdminReviewState('rejected');
+                  return;
+                }
+              }
+            } catch (e) {}
+
+            // Poll live backend
+            const res = await fetch(`${base}/api/v1/institution/appeals/${ticketId}`, { cache: 'no-store' });
             if (res.ok) {
               const data = await res.json();
               if (data?.appeal?.status === 'APPROVED_WHITELISTED' || data?.appeal?.status === 'APPROVED') {
@@ -537,13 +558,13 @@ export default function UpiCheckScreen({ onBack, backendUrl, user, initialPreset
     window.location.href = upiUri;
   };
 
-  const handleSubmitTicket = () => {
+  const handleSubmitTicket = async () => {
     const generatedId = `VRX-REV-${Math.floor(100000 + Math.random() * 900000)}`;
     setTicketId(generatedId);
     setCountdownSeconds(300); // 5 mins
     setAdminReviewState('waiting');
 
-    // Save to local History storage
+    // 1. Save to mobile user's ticket history
     try {
       const existing = JSON.parse(localStorage.getItem('shieldx_tickets_history') || '[]');
       const newEntry = {
@@ -560,9 +581,29 @@ export default function UpiCheckScreen({ onBack, backendUrl, user, initialPreset
       localStorage.setItem('shieldx_tickets_history', JSON.stringify([newEntry, ...existing]));
     } catch (e) {}
 
-    // Send appeal to backend Institution API & Web Dashboard
+    // 2. Also save to verix_bank_appeals in localStorage (so same-browser/device web bank portal gets it immediately!)
     try {
-      fetch(`${backendUrl}/api/v1/institution/appeal`, {
+      const bankAppeals = JSON.parse(localStorage.getItem('verix_bank_appeals') || '[]');
+      const newBankAppeal = {
+        id: generatedId,
+        ticketId: generatedId,
+        identifier: vpa ? `VPA: ${vpa}` : 'Flagged Account',
+        vpa: vpa || 'Unknown VPA',
+        amount: amount ? (amount.toString().startsWith('₹') ? amount : `₹${Number(amount).toLocaleString('en-IN')}`) : '₹12,450.00',
+        reason: 'Velocity Spike',
+        details: note || 'Dispute submitted by citizen via mobile app.',
+        status: 'PENDING',
+        timestamp: 'Just now',
+        resolvedBy: null,
+        resolvedAt: null
+      };
+      localStorage.setItem('verix_bank_appeals', JSON.stringify([newBankAppeal, ...bankAppeals]));
+    } catch (e) {}
+
+    // 3. Send appeal to backend Institution API & Web Dashboard
+    try {
+      const base = backendUrl || 'https://fruadsih.onrender.com';
+      await fetch(`${base}/api/v1/institution/appeals`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -576,8 +617,10 @@ export default function UpiCheckScreen({ onBack, backendUrl, user, initialPreset
           reason: `Dispute / Admin review ticket requested for transfer of ₹${amount || 0} to ${vpa}. Note: ${note || 'None'}`,
           evidenceDescription: `Caller: ${isOnCall ? activeCaller : 'None'}`
         })
-      }).catch(() => {});
-    } catch (e) {}
+      });
+    } catch (e) {
+      console.warn('Backend appeal sync error:', e);
+    }
   };
 
   const formatTimer = (seconds) => {

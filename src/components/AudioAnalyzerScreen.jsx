@@ -452,22 +452,18 @@ export default function AudioAnalyzerScreen({ onBack, backendUrl, currentLang = 
             )}
 
             {/* Upload File Input for Android WebView */}
-            <input 
-              type="file" 
-              id="audio-analyzer-upload-input"
-              ref={fileInputRef}
-              accept="audio/*"
-              onChange={handleFileUpload}
-              style={{ position: 'absolute', opacity: 0, width: '1px', height: '1px', pointerEvents: 'none', zIndex: -1 }}
-            />
-            <label
-              htmlFor="audio-analyzer-upload-input"
-              onClick={() => fileInputRef.current?.click()}
-              className="btn-tier-2 px-3.5 py-3 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <Upload className="w-4 h-4 text-white" />
-              <span className="hidden sm:inline">Upload</span>
-            </label>
+            <div className="relative overflow-hidden flex items-center justify-center">
+              <input 
+                type="file" 
+                accept="audio/*"
+                onChange={handleFileUpload}
+                className="absolute inset-0 w-full h-full opacity-0 z-30 cursor-pointer"
+              />
+              <div className="btn-tier-2 px-3.5 py-3 text-xs font-semibold flex items-center justify-center gap-1.5 pointer-events-none">
+                <Upload className="w-4 h-4 text-white" />
+                <span className="hidden sm:inline">Upload</span>
+              </div>
+            </div>
           </div>
 
           {uploadStatus && (
