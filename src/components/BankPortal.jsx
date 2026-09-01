@@ -199,6 +199,48 @@ const INDIA_STATES_HEATMAP_DATA = [
   }
 ];
 
+const SEED_APPEALS = [
+  {
+    id: 'APP-8924-X',
+    ticketId: 'APP-8924-X',
+    identifier: 'Acct: 4892-***-229',
+    vpa: 'merchant.kirana@paytm',
+    amount: '₹12,450.00',
+    reason: 'Velocity Spike',
+    details: 'Legitimate grocery store QR mistakenly reported by rival merchant.',
+    status: 'PENDING',
+    timestamp: '10 mins ago',
+    resolvedBy: null,
+    resolvedAt: null
+  },
+  {
+    id: 'APP-8925-Y',
+    ticketId: 'APP-8925-Y',
+    identifier: 'IP: 192.168.1.104',
+    vpa: 'student.hostel@oksbi',
+    amount: '₹3,200.50',
+    reason: 'Geo Mismatch',
+    details: 'Student transacting from college campus hostel Wi-Fi proxy.',
+    status: 'PENDING',
+    timestamp: '25 mins ago',
+    resolvedBy: null,
+    resolvedAt: null
+  },
+  {
+    id: 'APP-8926-Z',
+    ticketId: 'APP-8926-Z',
+    identifier: 'Dev: MAC-99A1',
+    vpa: 'freelance.designer@icici',
+    amount: '₹850.00',
+    reason: 'New Device Login',
+    details: 'Designer upgraded to new laptop for client project delivery.',
+    status: 'PENDING',
+    timestamp: '1 hour ago',
+    resolvedBy: null,
+    resolvedAt: null
+  }
+];
+
 export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
   // Session / Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -212,14 +254,25 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
     mobile: '9845012345'
   });
 
-  // Navigation tabs: 'dashboard' | 'threat_heatmap' | 'database_search' | 'disputes' | 'statistics_impact' | 'audio_lab' | 'sim_carrier' | 'advisories'
+  // Navigation tabs: 'threat_heatmap' | 'database_search' | 'disputes' | 'statistics_impact' | 'audio_lab' | 'sim_carrier' | 'advisories'
   const [activeTab, setActiveTab] = useState('threat_heatmap');
-  const [appeals, setAppeals] = useState([]);
+  const [appeals, setAppeals] = useState(SEED_APPEALS);
   const [threats, setThreats] = useState(() => Array.isArray(INITIAL_THREAT_RECORDS) ? INITIAL_THREAT_RECORDS : []);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [actionSuccess, setActionSuccess] = useState('');
   
+  // Appeals Review Desk State & Sub-tabs
+  const [appealsSubTab, setAppealsSubTab] = useState('PENDING'); // 'PENDING' | 'HISTORY'
+  const [showAppealsFilter, setShowAppealsFilter] = useState(false);
+  const [appealsSearch, setAppealsSearch] = useState('');
+  const [appealsReasonFilter, setAppealsReasonFilter] = useState('ALL');
+  const [showSubmitAppealModal, setShowSubmitAppealModal] = useState(false);
+  const [newAppealVpa, setNewAppealVpa] = useState('');
+  const [newAppealAmount, setNewAppealAmount] = useState('');
+  const [newAppealReason, setNewAppealReason] = useState('Velocity Spike');
+  const [newAppealDetails, setNewAppealDetails] = useState('');
+
   // State Drilldown & Heatmap State
   const [selectedStateId, setSelectedStateId] = useState('JH');
   const [pinSearch, setPinSearch] = useState('');
@@ -235,17 +288,12 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
   const [newThreatCategory, setNewThreatCategory] = useState('DIGITAL_ARREST');
   const [newThreatDetails, setNewThreatDetails] = useState('');
 
-  // Database Filter & Pagination States (Top-level Hook Declarations)
+  // Database Filter & Pagination States
   const [selectedType, setSelectedType] = useState('ALL');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedRows, setSelectedRows] = useState(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 12;
-
-  // Live Interception Feed Filter & Pagination States
-  const [feedTypeFilter, setFeedTypeFilter] = useState('ALL'); // 'ALL' | 'UPI' | 'BANK' | 'SIM'
-  const [feedSearch, setFeedSearch] = useState('');
-  const [feedPage, setFeedPage] = useState(1);
 
   // ROI Slider
   const [simulatedTxnVolume, setSimulatedTxnVolume] = useState(100000);
@@ -265,7 +313,9 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
 
       if (appealsRes && appealsRes.ok) {
         const data = await appealsRes.json();
-        setAppeals(data.data || []);
+        if (Array.isArray(data.data) && data.data.length > 0) {
+          setAppeals(data.data);
+        }
       }
       if (threatsRes && threatsRes.ok) {
         const data = await threatsRes.json();
@@ -287,7 +337,7 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
   const handleResolveAppeal = async (appealId, decision) => {
     try {
       const base = backendUrl || 'https://fruadsih.onrender.com';
-      await fetch(`${base}/api/v1/institution/appeals/${appealId}/resolve`, {
+      fetch(`${base}/api/v1/institution/appeals/${appealId}/resolve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -295,21 +345,70 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
           reviewerNotes: `Reviewed and resolved by Nodal Officer ${loginForm.fullName}`,
           resolvedBy: loginForm.fullName
         })
-      });
+      }).catch(() => null);
 
       setAppeals(prev => prev.map(a => {
         if ((a.appealId || a.ticketId || a.id) === appealId) {
-          return { ...a, status: decision, resolvedAt: new Date().toISOString() };
+          return { 
+            ...a, 
+            status: decision, 
+            resolvedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+            resolvedBy: loginForm.fullName
+          };
         }
         return a;
       }));
 
-      setActionSuccess(`Appeal ${appealId} marked as ${decision}`);
-      setTimeout(() => setActionSuccess(''), 3000);
+      setActionSuccess(`Appeal ${appealId} marked as ${decision} & moved to Resolution History!`);
+      setTimeout(() => setActionSuccess(''), 3500);
       setSelectedTicket(null);
     } catch (e) {
       alert('Error updating appeal: ' + e.message);
     }
+  };
+
+  const handleReopenAppeal = (appealId) => {
+    setAppeals(prev => prev.map(a => {
+      if ((a.appealId || a.ticketId || a.id) === appealId) {
+        return {
+          ...a,
+          status: 'PENDING',
+          resolvedAt: null,
+          resolvedBy: null
+        };
+      }
+      return a;
+    }));
+    setActionSuccess(`Appeal ${appealId} restored to Pending Queue!`);
+    setTimeout(() => setActionSuccess(''), 3000);
+  };
+
+  const handleCreateNewAppeal = (e) => {
+    e.preventDefault();
+    if (!newAppealVpa) return;
+    const ticketId = `APP-${Math.floor(1000 + Math.random() * 9000)}-${String.fromCharCode(65 + Math.floor(Math.random() * 26))}`;
+    const newAppeal = {
+      id: ticketId,
+      ticketId: ticketId,
+      identifier: newAppealVpa.includes('@') ? `VPA: ${newAppealVpa}` : `Acct: ${newAppealVpa}`,
+      vpa: newAppealVpa,
+      amount: newAppealAmount ? (newAppealAmount.startsWith('₹') ? newAppealAmount : `₹${newAppealAmount}`) : '₹5,000.00',
+      reason: newAppealReason,
+      details: newAppealDetails || 'Submitted via dispute arbitration desk.',
+      status: 'PENDING',
+      timestamp: 'Just now',
+      resolvedBy: null,
+      resolvedAt: null
+    };
+
+    setAppeals([newAppeal, ...appeals]);
+    setShowSubmitAppealModal(false);
+    setNewAppealVpa('');
+    setNewAppealAmount('');
+    setNewAppealDetails('');
+    setAppealsSubTab('PENDING');
+    setActionSuccess(`Appeal ticket ${ticketId} created and added to Pending Queue!`);
+    setTimeout(() => setActionSuccess(''), 3500);
   };
 
   const handleAddNewThreat = (e) => {
@@ -336,7 +435,21 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
     setTimeout(() => setActionSuccess(''), 3000);
   };
 
-  const pendingCount = appeals.filter(a => a && (a.status === 'PENDING_REVIEW' || a.status === 'PENDING' || !a.status)).length || 3;
+  // Split Appeals into Pending and Resolution History
+  const pendingAppeals = appeals.filter(a => a && (a.status === 'PENDING' || a.status === 'PENDING_REVIEW' || !a.status));
+  const resolvedAppeals = appeals.filter(a => a && (a.status === 'APPROVED' || a.status === 'REJECTED'));
+  const pendingCount = pendingAppeals.length;
+
+  const currentAppealsList = (appealsSubTab === 'PENDING' ? pendingAppeals : resolvedAppeals).filter(a => {
+    const matchesSearch = !appealsSearch ||
+      a.id?.toLowerCase().includes(appealsSearch.toLowerCase()) ||
+      a.ticketId?.toLowerCase().includes(appealsSearch.toLowerCase()) ||
+      a.identifier?.toLowerCase().includes(appealsSearch.toLowerCase()) ||
+      a.vpa?.toLowerCase().includes(appealsSearch.toLowerCase()) ||
+      a.reason?.toLowerCase().includes(appealsSearch.toLowerCase());
+    const matchesReason = appealsReasonFilter === 'ALL' || a.reason?.toLowerCase() === appealsReasonFilter.toLowerCase();
+    return matchesSearch && matchesReason;
+  });
 
   // Filtered threats for Database Table
   const filteredThreats = threats.filter(t => {
@@ -382,54 +495,6 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
     setActionSuccess(`Exported ${filteredThreats.length} records to ${format.toUpperCase()}`);
     setTimeout(() => setActionSuccess(''), 3000);
   };
-
-  // Sample Live Feed Items for Dashboard
-  const liveInterceptionFeed = [
-    { time: '14:22:01', id: 'scammer.cybercell@oksbi', type: 'UPI', risk: 98, status: 'BLOCKED' },
-    { time: '14:21:45', id: '+91 98765 43210', type: 'SIM SWAP', risk: 92, status: 'BLOCKED' },
-    { time: '14:20:12', id: 'ACC_09918237', type: 'BANK TRANSFER', risk: 78, status: 'FLAGGED' },
-    { time: '14:18:59', id: 'fake.helpline@ybl', type: 'UPI', risk: 12, status: 'SAFE' },
-    { time: '14:15:30', id: 'cbi.officer.verma@oksbi', type: 'UPI', risk: 96, status: 'BLOCKED' },
-    { time: '14:12:10', id: '+91 94775 30475', type: 'SIM SWAP', risk: 94, status: 'BLOCKED' },
-    { time: '14:09:40', id: 'SBIN0001234_50100432', type: 'BANK TRANSFER', risk: 91, status: 'BLOCKED' }
-  ].filter(item => {
-    if (feedTypeFilter === 'ALL') return true;
-    if (feedTypeFilter === 'UPI') return item.type === 'UPI';
-    if (feedTypeFilter === 'BANK') return item.type === 'BANK TRANSFER';
-    if (feedTypeFilter === 'SIM') return item.type === 'SIM SWAP';
-    return true;
-  });
-
-  // Sample Appeals for Disputes Tab
-  const displayAppeals = appeals.length > 0 ? appeals : [
-    {
-      id: 'APP-8924-X',
-      ticketId: 'APP-8924-X',
-      identifier: 'Acct: 4892-***-229',
-      vpa: 'merchant.kirana@paytm',
-      amount: '₹12,450.00',
-      reason: 'Velocity Spike',
-      details: 'Legitimate grocery store QR mistakenly reported by competitor.'
-    },
-    {
-      id: 'APP-8925-Y',
-      ticketId: 'APP-8925-Y',
-      identifier: 'IP: 192.168.1.104',
-      vpa: 'student.hostel@oksbi',
-      amount: '₹3,200.50',
-      reason: 'Geo Mismatch',
-      details: 'Student transacting from college campus hostel Wi-Fi proxy.'
-    },
-    {
-      id: 'APP-8926-Z',
-      ticketId: 'APP-8926-Z',
-      identifier: 'Dev: MAC-99A1',
-      vpa: 'freelance.designer@icici',
-      amount: '₹850.00',
-      reason: 'New Device Login',
-      details: 'Designer upgraded to new laptop for client project delivery.'
-    }
-  ];
 
   // ════════════════════════════════════════════════════════════════════════════════
   // 1. SECURE ACCESS TERMINAL (LOGIN SCREEN)
@@ -1217,68 +1282,216 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
           )}
 
           {/* ══════════════════════════════════════════════════════════════
-              TAB 3: APPEALS REVIEW QUEUE (STITCH EXACT CARDS)
+              TAB 3: APPEALS REVIEW QUEUE & RESOLUTION HISTORY
           ══════════════════════════════════════════════════════════════ */}
           {activeTab === 'disputes' && (
             <div className="flex-1 bg-[#141313] flex flex-col p-6 overflow-y-auto text-[#e5e2e1] font-mono">
-              {/* Header */}
-              <div className="flex justify-between items-end mb-6 border-b border-white/10 pb-4">
+              
+              {/* Header & Sub-Tabs */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-4 border-b border-white/10 pb-4">
                 <div>
                   <h1 className="text-2xl font-bold text-white font-sans tracking-tight">False-Positive Appeals Review Desk</h1>
-                  <p className="text-xs text-[#8e9193] mt-1">{displayAppeals.length} Pending</p>
+                  <p className="text-xs text-[#8e9193] mt-1">
+                    {pendingCount} Pending Review • {resolvedAppeals.length} Resolved in History
+                  </p>
                 </div>
-                <div className="flex gap-2">
-                  <button className="bg-[#2a2a2a] border border-white/10 hover:border-white px-4 py-2 text-xs font-bold uppercase flex items-center gap-2 transition-colors cursor-pointer">
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* Sub-tab Navigation */}
+                  <div className="flex bg-[#201f1f] border border-white/10 p-0.5 rounded">
+                    <button
+                      onClick={() => setAppealsSubTab('PENDING')}
+                      className={`px-3 py-1.5 text-xs font-bold uppercase transition-all cursor-pointer ${
+                        appealsSubTab === 'PENDING'
+                          ? 'bg-white text-black font-black'
+                          : 'text-[#8e9193] hover:text-white'
+                      }`}
+                    >
+                      📋 Pending ({pendingCount})
+                    </button>
+                    <button
+                      onClick={() => setAppealsSubTab('HISTORY')}
+                      className={`px-3 py-1.5 text-xs font-bold uppercase transition-all cursor-pointer ${
+                        appealsSubTab === 'HISTORY'
+                          ? 'bg-white text-black font-black'
+                          : 'text-[#8e9193] hover:text-white'
+                      }`}
+                    >
+                      📜 History ({resolvedAppeals.length})
+                    </button>
+                  </div>
+
+                  {/* Filter Toggle Button */}
+                  <button 
+                    onClick={() => setShowAppealsFilter(!showAppealsFilter)}
+                    className={`border px-3.5 py-1.5 text-xs font-bold uppercase flex items-center gap-1.5 transition-colors cursor-pointer ${
+                      showAppealsFilter 
+                        ? 'bg-[#00F0A0] text-black border-[#00F0A0]' 
+                        : 'bg-[#2a2a2a] border-white/10 hover:border-white text-white'
+                    }`}
+                  >
                     <Filter className="w-3.5 h-3.5" />
-                    Filter
+                    <span>Filter</span>
+                    {showAppealsFilter && <span className="text-[10px]">●</span>}
+                  </button>
+
+                  {/* Create New Appeal Button */}
+                  <button
+                    onClick={() => setShowSubmitAppealModal(true)}
+                    className="bg-[#00F0A0] hover:bg-[#00e296] text-black font-bold text-xs uppercase px-3.5 py-1.5 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  >
+                    <span className="text-base leading-none font-black">+</span>
+                    <span>New Appeal</span>
                   </button>
                 </div>
               </div>
 
-              {/* Appeals Queue */}
+              {/* Collapsible Filter Toolbar */}
+              {showAppealsFilter && (
+                <div className="bg-[#171E2B] border border-white/10 p-3 mb-4 flex flex-col md:flex-row gap-3 items-center">
+                  <div className="relative flex-1 w-full">
+                    <Search className="w-3.5 h-3.5 text-[#8e9193] absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={appealsSearch}
+                      onChange={(e) => setAppealsSearch(e.target.value)}
+                      placeholder="Search ticket ID, VPA, identifier, or reason..."
+                      className="w-full bg-[#10141C] border border-white/10 text-white pl-8 pr-3 py-1.5 text-xs font-mono focus:border-[#00F0A0] focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex gap-2 w-full md:w-auto">
+                    <select
+                      value={appealsReasonFilter}
+                      onChange={(e) => setAppealsReasonFilter(e.target.value)}
+                      className="bg-[#10141C] border border-white/10 text-xs text-white px-3 py-1.5 focus:border-[#00F0A0] focus:outline-none cursor-pointer"
+                    >
+                      <option value="ALL">REASON: ALL</option>
+                      <option value="Velocity Spike">Velocity Spike</option>
+                      <option value="Geo Mismatch">Geo Mismatch</option>
+                      <option value="New Device Login">New Device Login</option>
+                      <option value="Merchant False-Positive">Merchant False-Positive</option>
+                    </select>
+
+                    <button
+                      onClick={() => { setAppealsSearch(''); setAppealsReasonFilter('ALL'); }}
+                      className="px-3 py-1.5 bg-[#201f1f] hover:bg-white/10 border border-white/10 text-xs text-[#8e9193] hover:text-white transition-colors cursor-pointer"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Appeals Cards Grid / List */}
               <div className="flex flex-col gap-4">
-                {displayAppeals.map((a, idx) => (
-                  <div
-                    key={a.id || a.ticketId || idx}
-                    className="bg-[#201f1f] p-4 border border-white/10 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-white/20 transition-colors"
-                  >
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full md:w-3/4 text-xs">
-                      <div>
-                        <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Ticket ID</div>
-                        <div className="text-sm font-bold text-white">{a.id || a.ticketId || `APP-${8924 + idx}-X`}</div>
-                      </div>
-                      <div>
-                        <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Flagged Identifier</div>
-                        <div className="text-xs text-white font-bold">{a.identifier || a.vpa || 'merchant.kirana@paytm'}</div>
-                      </div>
-                      <div>
-                        <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Amount</div>
-                        <div className="text-sm font-bold text-[#00F0A0]">{a.amount?.toString().startsWith('₹') || a.amount?.toString().startsWith('$') ? a.amount : `₹${a.amount || '12,450'}`}</div>
-                      </div>
-                      <div>
-                        <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Reason Code</div>
-                        <div className="text-xs text-white bg-white/5 px-2 py-1 inline-block border border-white/10 rounded-sm">
-                          {a.reason || 'Velocity Spike'}
+                {currentAppealsList.length === 0 ? (
+                  <div className="bg-[#201f1f] p-12 border border-white/10 rounded-lg text-center">
+                    <CheckCircle2 className="w-10 h-10 text-[#00F0A0] mx-auto mb-3 opacity-60" />
+                    <h3 className="text-base font-bold text-white mb-1">
+                      {appealsSubTab === 'PENDING' ? 'No Pending Appeals in Queue' : 'No Resolved Appeals in History'}
+                    </h3>
+                    <p className="text-xs text-[#8e9193] max-w-md mx-auto">
+                      {appealsSubTab === 'PENDING'
+                        ? 'All citizen dispute tickets have been reviewed and resolved. Use "+ New Appeal" to submit a test dispute.'
+                        : 'Resolved tickets will automatically appear here once approved or rejected.'}
+                    </p>
+                  </div>
+                ) : (
+                  currentAppealsList.map((a, idx) => {
+                    const isPending = a.status === 'PENDING' || a.status === 'PENDING_REVIEW' || !a.status;
+                    const isApproved = a.status === 'APPROVED';
+                    const isRejected = a.status === 'REJECTED';
+
+                    return (
+                      <div
+                        key={a.id || a.ticketId || idx}
+                        className={`p-4 border rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all ${
+                          isPending 
+                            ? 'bg-[#201f1f] border-white/10 hover:border-white/20' 
+                            : (isApproved ? 'bg-[#00F0A0]/5 border-[#00F0A0]/30' : 'bg-[#FF4B4B]/5 border-[#FF4B4B]/30')
+                        }`}
+                      >
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full md:w-3/4 text-xs">
+                          <div>
+                            <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Ticket ID</div>
+                            <div className="text-sm font-bold text-white flex items-center gap-1.5">
+                              <span>{a.id || a.ticketId || `APP-${8924 + idx}-X`}</span>
+                            </div>
+                            <span className="text-[10px] text-[#8e9193] block mt-0.5">{a.timestamp || 'Recent'}</span>
+                          </div>
+                          <div>
+                            <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Flagged Identifier</div>
+                            <div className="text-xs text-white font-bold truncate max-w-[180px]">{a.identifier || a.vpa || 'merchant.kirana@paytm'}</div>
+                            <span className="text-[10px] text-[#8e9193] block mt-0.5">{a.vpa || 'UPI Gateway'}</span>
+                          </div>
+                          <div>
+                            <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Amount</div>
+                            <div className="text-sm font-bold text-[#00F0A0]">
+                              {a.amount?.toString().startsWith('₹') || a.amount?.toString().startsWith('$') ? a.amount : `₹${a.amount || '12,450'}`}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Reason Code</div>
+                            <div className="text-xs text-white bg-white/5 px-2 py-1 inline-block border border-white/10 rounded-sm">
+                              {a.reason || 'Velocity Spike'}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Case Details Snippet if any */}
+                        {a.details && (
+                          <div className="w-full md:hidden text-[11px] text-[#8e9193] border-t border-white/5 pt-2">
+                            {a.details}
+                          </div>
+                        )}
+
+                        {/* Action Buttons or Resolution Status */}
+                        <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+                          {isPending ? (
+                            <>
+                              <button
+                                onClick={() => handleResolveAppeal(a.id || a.ticketId, 'REJECTED')}
+                                className="flex-1 md:flex-none border border-[#FF4B4B] text-[#FF4B4B] hover:bg-[#FF4B4B]/10 px-4 py-2 text-xs font-bold uppercase transition-colors cursor-pointer active:scale-95"
+                              >
+                                Reject
+                              </button>
+                              <button
+                                onClick={() => handleResolveAppeal(a.id || a.ticketId, 'APPROVED')}
+                                className="flex-1 md:flex-none border border-[#10b981] text-[#10b981] hover:bg-[#10b981]/10 px-4 py-2 text-xs font-bold uppercase transition-colors cursor-pointer active:scale-95"
+                              >
+                                Approve
+                              </button>
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-3">
+                              <div className="text-right">
+                                <span className={`inline-block px-2.5 py-1 text-[11px] font-black uppercase tracking-wider ${
+                                  isApproved 
+                                    ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]' 
+                                    : 'bg-[#FF4B4B]/20 text-[#FF4B4B] border border-[#FF4B4B]'
+                                }`}>
+                                  {isApproved ? '✓ APPROVED (UNBLOCKED)' : '✕ REJECTED (CONFIRMED)'}
+                                </span>
+                                <span className="text-[10px] text-[#8e9193] block mt-1">
+                                  {a.resolvedBy || loginForm.fullName} {a.resolvedAt ? `at ${a.resolvedAt}` : ''}
+                                </span>
+                              </div>
+
+                              <button
+                                onClick={() => handleReopenAppeal(a.id || a.ticketId)}
+                                title="Restore back to Pending Queue"
+                                className="p-2 bg-[#201f1f] hover:bg-white/10 border border-white/10 text-[#8e9193] hover:text-white transition-colors cursor-pointer"
+                              >
+                                <RotateCcw className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    </div>
-
-                    <div className="flex gap-2 w-full md:w-auto justify-end">
-                      <button
-                        onClick={() => handleResolveAppeal(a.id || a.ticketId, 'REJECTED')}
-                        className="flex-1 md:flex-none border border-[#FF4B4B] text-[#FF4B4B] hover:bg-[#FF4B4B]/10 px-4 py-2 text-xs font-bold uppercase transition-colors cursor-pointer active:scale-95"
-                      >
-                        Reject
-                      </button>
-                      <button
-                        onClick={() => handleResolveAppeal(a.id || a.ticketId, 'APPROVED')}
-                        className="flex-1 md:flex-none border border-[#10b981] text-[#10b981] hover:bg-[#10b981]/10 px-4 py-2 text-xs font-bold uppercase transition-colors cursor-pointer active:scale-95"
-                      >
-                        Approve
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })
+                )}
               </div>
             </div>
           )}
@@ -1575,6 +1788,89 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
         </aside>
 
       </div>
+
+      {/* ── MODAL: SUBMIT NEW CITIZEN APPEAL TICKET ── */}
+      {showSubmitAppealModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-[#10141C] border border-white/[0.1] p-5 space-y-4 shadow-2xl">
+            <div className="flex justify-between items-center border-b border-white/[0.08] pb-2">
+              <h3 className="text-sm font-bold text-white uppercase flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#00F0A0]" />
+                Submit Citizen False-Positive Appeal
+              </h3>
+              <button onClick={() => setShowSubmitAppealModal(false)} className="text-[#e4bdba] hover:text-white cursor-pointer">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateNewAppeal} className="space-y-3">
+              <div>
+                <label className="text-[10px] uppercase text-[#e4bdba] block mb-1">Flagged VPA / Account / Phone</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. merchant.bakery@oksbi or 9845012345"
+                  value={newAppealVpa}
+                  onChange={(e) => setNewAppealVpa(e.target.value)}
+                  className="w-full bg-[#171E2B] border border-white/[0.08] p-2.5 text-xs text-white focus:outline-none focus:border-[#00F0A0]"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] uppercase text-[#e4bdba] block mb-1">Transaction Amount (₹)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. ₹15,000.00"
+                  value={newAppealAmount}
+                  onChange={(e) => setNewAppealAmount(e.target.value)}
+                  className="w-full bg-[#171E2B] border border-white/[0.08] p-2.5 text-xs text-white focus:outline-none focus:border-[#00F0A0]"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] uppercase text-[#e4bdba] block mb-1">Reason Code</label>
+                <select
+                  value={newAppealReason}
+                  onChange={(e) => setNewAppealReason(e.target.value)}
+                  className="w-full bg-[#171E2B] border border-white/[0.08] p-2.5 text-xs text-white focus:outline-none focus:border-[#00F0A0]"
+                >
+                  <option value="Velocity Spike">Velocity Spike (Legitimate Sale Rush)</option>
+                  <option value="Geo Mismatch">Geo Mismatch (VPN / Campus Hostel Proxy)</option>
+                  <option value="New Device Login">New Device Login (Upgraded Phone)</option>
+                  <option value="Merchant False-Positive">Merchant False-Positive (Rival Grievance)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[10px] uppercase text-[#e4bdba] block mb-1">Dispute Explanation</label>
+                <textarea
+                  rows={3}
+                  placeholder="Citizen / Merchant statement..."
+                  value={newAppealDetails}
+                  onChange={(e) => setNewAppealDetails(e.target.value)}
+                  className="w-full bg-[#171E2B] border border-white/[0.08] p-2.5 text-xs text-white focus:outline-none focus:border-[#00F0A0]"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowSubmitAppealModal(false)}
+                  className="px-4 py-2 border border-white/[0.08] text-xs text-[#e4bdba] hover:bg-white/5 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-[#00F0A0] text-black font-bold text-xs uppercase cursor-pointer hover:bg-[#00e296]"
+                >
+                  Submit Appeal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* ── MODAL: ADD THREAT RECORD ── */}
       {showAddThreatModal && (
