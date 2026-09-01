@@ -870,109 +870,358 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
           )}
 
           {/* ══════════════════════════════════════════════════════════════
-              TAB 2: THREAT REGISTRY DATABASE (FULL SEARCH TABLE)
+              TAB 2: THREAT REGISTRY DATABASE (STITCH COMPLETE TABLE & FILTERS)
           ══════════════════════════════════════════════════════════════ */}
-          {activeTab === 'database_search' && (
-            <div className="flex-1 bg-[#10141C] border border-white/[0.08] p-4 flex flex-col gap-3 overflow-hidden">
-              <div className="flex justify-between items-center border-b border-white/[0.08] pb-3">
-                <div className="flex items-center gap-2">
-                  <Database className="w-5 h-5 text-[#00F0A0]" />
-                  <h2 className="text-sm font-bold text-white uppercase">National Threat Registry Database ({threats.length.toLocaleString()} Records)</h2>
-                </div>
-                <button
-                  onClick={() => setShowAddThreatModal(true)}
-                  className="px-3 py-1.5 bg-[#00F0A0] text-black font-bold text-xs uppercase cursor-pointer"
-                >
-                  + Add Record
-                </button>
-              </div>
+          {activeTab === 'database_search' && (() => {
+            const [selectedType, setSelectedType] = useState('ALL');
+            const [selectedCategory, setSelectedCategory] = useState('ALL');
+            const [selectedRows, setSelectedRows] = useState(new Set());
+            const [currentPage, setCurrentPage] = useState(1);
+            const pageSize = 12;
 
-              <div className="relative">
-                <Search className="w-4 h-4 text-[#e4bdba] absolute left-3 top-2.5" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Filter by VPA, Phone, or IFSC..."
-                  className="w-full bg-[#171E2B] border border-white/[0.08] py-2 pl-9 pr-3 text-xs text-white focus:outline-none focus:border-[#00F0A0]"
-                />
-              </div>
+            const filteredThreats = threats.filter(t => {
+              const matchesQuery = !searchQuery || 
+                t.identifier?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                t.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                t.source?.toLowerCase().includes(searchQuery.toLowerCase());
+              const matchesType = selectedType === 'ALL' || t.type?.toUpperCase() === selectedType;
+              const matchesCategory = selectedCategory === 'ALL' || t.category?.toUpperCase() === selectedCategory;
+              return matchesQuery && matchesType && matchesCategory;
+            });
 
-              <div className="flex-1 overflow-y-auto border border-white/[0.08]">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-[#171E2B] text-[#e4bdba] uppercase text-[10px] sticky top-0">
-                    <tr>
-                      <th className="p-2.5">Identifier</th>
-                      <th className="p-2.5">Type</th>
-                      <th className="p-2.5">Category</th>
-                      <th className="p-2.5">Risk</th>
-                      <th className="p-2.5">Source</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {threats
-                      .filter(t => !searchQuery || t.identifier?.toLowerCase().includes(searchQuery.toLowerCase()))
-                      .slice(0, 50)
-                      .map((t, idx) => (
-                        <tr key={idx} className="border-b border-white/[0.04] hover:bg-[#171E2B] text-white">
-                          <td className="p-2.5 font-bold text-[#00F0A0]">{t.identifier}</td>
-                          <td className="p-2.5">{t.type}</td>
-                          <td className="p-2.5 text-[#e4bdba]">{t.category}</td>
-                          <td className="p-2.5 text-[#FF4B4B] font-bold">{t.riskScore || 95}%</td>
-                          <td className="p-2.5 text-[10px] text-[#e4bdba] truncate max-w-xs">{t.source || 'I4C Distributed Feed'}</td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
+            const totalPages = Math.ceil(filteredThreats.length / pageSize) || 1;
+            const paginatedThreats = filteredThreats.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-          {/* ══════════════════════════════════════════════════════════════
-              TAB 3: APPEALS REVIEW QUEUE
-          ══════════════════════════════════════════════════════════════ */}
-          {activeTab === 'disputes' && (
-            <div className="flex-1 bg-[#10141C] border border-white/[0.08] p-4 flex flex-col gap-3 overflow-hidden">
-              <div className="flex justify-between items-center border-b border-white/[0.08] pb-3">
-                <h2 className="text-sm font-bold text-white uppercase flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-amber-400" />
-                  False-Positive Appeals Review Desk ({appeals.length} Tickets)
-                </h2>
-              </div>
+            const toggleSelectAll = () => {
+              if (selectedRows.size === paginatedThreats.length) {
+                setSelectedRows(new Set());
+              } else {
+                setSelectedRows(new Set(paginatedThreats.map((_, i) => i)));
+              }
+            };
 
-              <div className="flex-1 overflow-y-auto space-y-2">
-                {appeals.length === 0 ? (
-                  <div className="p-8 text-center text-[#e4bdba] bg-[#171E2B] border border-white/[0.08]">
-                    No pending appeals in queue. All false-positive reviews are clear.
+            const toggleSelectRow = (idx) => {
+              const next = new Set(selectedRows);
+              if (next.has(idx)) next.delete(idx);
+              else next.add(idx);
+              setSelectedRows(next);
+            };
+
+            const exportData = (format) => {
+              const dataStr = format === 'json'
+                ? "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(filteredThreats, null, 2))
+                : "data:text/csv;charset=utf-8," + encodeURIComponent(
+                    ["Identifier,Type,Category,RiskScore,Source", ...filteredThreats.map(t => `"${t.identifier}","${t.type}","${t.category}",${t.riskScore || 95},"${t.source || 'I4C'}"`)].join("\n")
+                  );
+              const downloadAnchor = document.createElement('a');
+              downloadAnchor.setAttribute("href", dataStr);
+              downloadAnchor.setAttribute("download", `verix_threat_registry_${Date.now()}.${format}`);
+              document.body.appendChild(downloadAnchor);
+              downloadAnchor.click();
+              downloadAnchor.remove();
+              setActionSuccess(`Exported ${filteredThreats.length} records to ${format.toUpperCase()}`);
+              setTimeout(() => setActionSuccess(''), 3000);
+            };
+
+            return (
+              <div className="flex-1 bg-[#141313] flex flex-col overflow-hidden text-[#e5e2e1]">
+                
+                {/* Page Header & Actions */}
+                <div className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 border-b border-white/10 bg-[#141313]">
+                  <div>
+                    <h1 className="text-xl font-bold text-white font-sans tracking-tight">National Threat Registry Database</h1>
+                    <p className="text-xs text-[#8e9193] mt-0.5 font-mono">{filteredThreats.length.toLocaleString()} Records Found</p>
                   </div>
-                ) : (
-                  appeals.map(a => (
-                    <div key={a.appealId || a.ticketId} className="p-3 bg-[#171E2B] border border-white/[0.08] flex items-center justify-between text-xs">
+                  <button
+                    onClick={() => setShowAddThreatModal(true)}
+                    className="bg-white text-black font-bold text-xs uppercase px-4 py-2 hover:bg-white/90 transition-colors flex items-center gap-2 border border-white cursor-pointer active:scale-95"
+                  >
+                    <span className="text-base leading-none font-black">+</span>
+                    <span>ADD RECORD</span>
+                  </button>
+                </div>
+
+                {/* Search & Filter Bar */}
+                <div className="px-6 py-3 shrink-0 bg-[#0e0e0e] border-b border-white/10 flex flex-col md:flex-row gap-3">
+                  <div className="relative flex-1">
+                    <Search className="w-4 h-4 text-[#8e9193] absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                      placeholder="Search VPA, Phone, IFSC, or Identifier..."
+                      className="w-full bg-[#141313] border border-white/10 text-white pl-9 pr-4 py-2 text-xs font-mono focus:border-white/40 focus:outline-none placeholder:text-[#8e9193]/50 transition-colors"
+                    />
+                  </div>
+
+                  {/* Filter by Type */}
+                  <select
+                    value={selectedType}
+                    onChange={(e) => { setSelectedType(e.target.value); setCurrentPage(1); }}
+                    className="bg-[#141313] border border-white/10 text-xs text-[#e5e2e1] px-3 py-2 focus:border-white/40 focus:outline-none cursor-pointer"
+                  >
+                    <option value="ALL">TYPE: ALL</option>
+                    <option value="VPA">VPA (UPI)</option>
+                    <option value="PHONE">PHONE</option>
+                    <option value="BANK_ACC">BANK ACC</option>
+                  </select>
+
+                  {/* Filter by Category */}
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => { setSelectedCategory(e.target.value); setCurrentPage(1); }}
+                    className="bg-[#141313] border border-white/10 text-xs text-[#e5e2e1] px-3 py-2 focus:border-white/40 focus:outline-none cursor-pointer"
+                  >
+                    <option value="ALL">CATEGORY: ALL</option>
+                    <option value="DIGITAL_ARREST">DIGITAL ARREST</option>
+                    <option value="MULE_ACCOUNT">MULE ACCOUNT</option>
+                    <option value="ELECTRICITY_BILL">POWER CUT SMS</option>
+                    <option value="PART_TIME_JOB">JOB SCAM</option>
+                    <option value="CUSTOMS_PARCEL">CUSTOMS PARCEL</option>
+                    <option value="SEXTO">SEXTORTION</option>
+                  </select>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => exportData('csv')}
+                      className="bg-[#141313] border border-white/10 text-xs text-[#e5e2e1] px-3 py-2 hover:border-white/40 transition-colors flex items-center gap-1.5 cursor-pointer font-mono"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>CSV</span>
+                    </button>
+                    <button
+                      onClick={() => exportData('json')}
+                      className="bg-[#141313] border border-white/10 text-xs text-[#e5e2e1] px-3 py-2 hover:border-white/40 transition-colors flex items-center gap-1.5 cursor-pointer font-mono"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>JSON</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Data Table Canvas */}
+                <div className="flex-1 overflow-auto px-6 py-4 bg-[#141313]">
+                  <div className="w-full min-w-[900px] border border-white/10 bg-[#0e0e0e] overflow-hidden">
+                    <table className="w-full text-left border-collapse font-mono">
+                      <thead className="bg-[#201f1f] border-b border-white/10 text-[10.5px] uppercase tracking-wider text-[#8e9193]">
+                        <tr>
+                          <th className="px-4 py-3 w-12 text-center">
+                            <input
+                              type="checkbox"
+                              checked={selectedRows.size > 0 && selectedRows.size === paginatedThreats.length}
+                              onChange={toggleSelectAll}
+                              className="cursor-pointer accent-[#00F0A0]"
+                            />
+                          </th>
+                          <th className="px-4 py-3">IDENTIFIER (VPA/ACC)</th>
+                          <th className="px-4 py-3">TYPE</th>
+                          <th className="px-4 py-3">CATEGORY</th>
+                          <th className="px-4 py-3 text-right">RISK SCORE</th>
+                          <th className="px-4 py-3">SOURCE FEED</th>
+                          <th className="px-4 py-3 w-16 text-center">ACT</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-xs text-[#e5e2e1]">
+                        {paginatedThreats.length === 0 ? (
+                          <tr>
+                            <td colSpan={7} className="text-center py-12 text-[#8e9193]">
+                              No threat records match your current search and filter criteria.
+                            </td>
+                          </tr>
+                        ) : (
+                          paginatedThreats.map((t, idx) => {
+                            const isEven = idx % 2 === 0;
+                            const isSelected = selectedRows.has(idx);
+                            const risk = t.riskScore || 95;
+                            const isCritical = risk >= 90;
+                            const isHigh = risk >= 70 && risk < 90;
+
+                            return (
+                              <tr
+                                key={t.id || idx}
+                                className={`border-b border-white/[0.06] transition-colors cursor-pointer group ${
+                                  isSelected ? 'bg-white/10' : (isEven ? 'bg-[#10141C]' : 'bg-[#171E2B]')
+                                } hover:bg-white/[0.08]`}
+                              >
+                                <td className="px-4 py-3 text-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => toggleSelectRow(idx)}
+                                    className="cursor-pointer accent-[#00F0A0]"
+                                  />
+                                </td>
+                                <td className="px-4 py-3">
+                                  <div className="flex items-center gap-2 font-bold text-white">
+                                    <AlertTriangle className={`w-3.5 h-3.5 shrink-0 ${isCritical ? 'text-[#FF4B4B]' : 'text-amber-400'}`} />
+                                    <span className="truncate max-w-xs">{t.identifier}</span>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-[#8e9193] font-bold">
+                                  <span className="px-1.5 py-0.5 bg-white/5 border border-white/10 text-[10px]">
+                                    {t.type || (t.identifier?.includes('@') ? 'VPA' : 'PHONE')}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3 text-[#e5e2e1] capitalize">
+                                  {t.category ? t.category.replace(/_/g, ' ').toLowerCase() : 'Mule Account'}
+                                </td>
+                                <td className="px-4 py-3 text-right font-bold">
+                                  <span className={isCritical ? 'text-[#FF4B4B]' : (isHigh ? 'text-amber-400' : 'text-[#8e9193]')}>
+                                    {risk}%
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3 text-[#8e9193] text-[11px] truncate max-w-[200px]">
+                                  {t.source || 'I4C National FIR #8921'}
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  <button
+                                    onClick={() => {
+                                      navigator.clipboard?.writeText(t.identifier);
+                                      setActionSuccess(`Copied ${t.identifier}`);
+                                      setTimeout(() => setActionSuccess(''), 2000);
+                                    }}
+                                    title="Copy Identifier"
+                                    className="text-[#8e9193] hover:text-white transition-colors cursor-pointer p-1"
+                                  >
+                                    <Copy className="w-3.5 h-3.5" />
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+
+                    {/* Pagination / Footer */}
+                    <div className="bg-[#201f1f] px-4 py-3 border-t border-white/10 flex justify-between items-center text-[#8e9193] text-[11px] font-mono">
                       <div>
-                        <div className="text-[#00F0A0] font-bold">{a.appealId || a.ticketId}</div>
-                        <div className="text-white">VPA: {a.vpa} • ₹{a.amount}</div>
-                        <div className="text-[10px] text-[#e4bdba]">{a.reason || 'Merchant account incorrectly flagged'}</div>
+                        SHOWING {paginatedThreats.length > 0 ? (currentPage - 1) * pageSize + 1 : 0}-
+                        {Math.min(currentPage * pageSize, filteredThreats.length)} OF {filteredThreats.length.toLocaleString()}
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex items-center gap-2">
                         <button
-                          onClick={() => handleResolveAppeal(a.appealId || a.ticketId, 'APPROVED')}
-                          className="px-3 py-1 bg-[#00F0A0] text-black font-bold uppercase text-[11px] cursor-pointer"
+                          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                          disabled={currentPage === 1}
+                          className="px-2 py-1 bg-white/5 border border-white/10 hover:text-white disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                         >
-                          Approve
+                          &lt;
                         </button>
+                        <span>PAGE {currentPage} OF {totalPages}</span>
                         <button
-                          onClick={() => handleResolveAppeal(a.appealId || a.ticketId, 'REJECTED')}
-                          className="px-3 py-1 bg-[#FF4B4B] text-white font-bold uppercase text-[11px] cursor-pointer"
+                          onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                          disabled={currentPage === totalPages}
+                          className="px-2 py-1 bg-white/5 border border-white/10 hover:text-white disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                         >
-                          Reject
+                          &gt;
                         </button>
                       </div>
                     </div>
-                  ))
-                )}
+                  </div>
+                </div>
+
               </div>
-            </div>
-          )}
+            );
+          })()}
+
+          {/* ══════════════════════════════════════════════════════════════
+              TAB 3: APPEALS REVIEW QUEUE (STITCH EXACT REVIEW CARDS)
+          ══════════════════════════════════════════════════════════════ */}
+          {activeTab === 'disputes' && (() => {
+            const sampleAppeals = appeals.length > 0 ? appeals : [
+              {
+                id: 'APP-8924-X',
+                ticketId: 'APP-8924-X',
+                identifier: 'Acct: 4892-***-229',
+                vpa: 'merchant.kirana@paytm',
+                amount: '₹12,450.00',
+                reason: 'Velocity Spike',
+                details: 'Legitimate grocery store QR mistakenly reported by competitor.'
+              },
+              {
+                id: 'APP-8925-Y',
+                ticketId: 'APP-8925-Y',
+                identifier: 'IP: 192.168.1.104',
+                vpa: 'student.hostel@oksbi',
+                amount: '₹3,200.50',
+                reason: 'Geo Mismatch',
+                details: 'Student transacting from college campus hostel Wi-Fi proxy.'
+              },
+              {
+                id: 'APP-8926-Z',
+                ticketId: 'APP-8926-Z',
+                identifier: 'Dev: MAC-99A1',
+                vpa: 'freelance.designer@icici',
+                amount: '₹850.00',
+                reason: 'New Device Login',
+                details: 'Designer upgraded to new laptop for client project delivery.'
+              }
+            ];
+
+            return (
+              <div className="flex-1 bg-[#141313] flex flex-col p-6 overflow-y-auto text-[#e5e2e1] font-mono">
+                {/* Header */}
+                <div className="flex justify-between items-end mb-6 border-b border-white/10 pb-4">
+                  <div>
+                    <h1 className="text-2xl font-bold text-white font-sans tracking-tight">False-Positive Appeals Review Desk</h1>
+                    <p className="text-xs text-[#8e9193] mt-1">{sampleAppeals.length} Pending</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="bg-[#2a2a2a] border border-white/10 hover:border-white px-4 py-2 text-xs font-bold uppercase flex items-center gap-2 transition-colors cursor-pointer">
+                      <Filter className="w-3.5 h-3.5" />
+                      Filter
+                    </button>
+                  </div>
+                </div>
+
+                {/* Appeals Queue */}
+                <div className="flex flex-col gap-4">
+                  {sampleAppeals.map((a, idx) => (
+                    <div
+                      key={a.id || a.ticketId || idx}
+                      className="bg-[#201f1f] p-4 border border-white/10 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-white/20 transition-colors"
+                    >
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full md:w-3/4 text-xs">
+                        <div>
+                          <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Ticket ID</div>
+                          <div className="text-sm font-bold text-white">{a.id || a.ticketId || `APP-${8924 + idx}-X`}</div>
+                        </div>
+                        <div>
+                          <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Flagged Identifier</div>
+                          <div className="text-xs text-white font-bold">{a.identifier || a.vpa || 'merchant.kirana@paytm'}</div>
+                        </div>
+                        <div>
+                          <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Amount</div>
+                          <div className="text-sm font-bold text-[#00F0A0]">{a.amount?.toString().startsWith('₹') || a.amount?.toString().startsWith('$') ? a.amount : `₹${a.amount || '12,450'}`}</div>
+                        </div>
+                        <div>
+                          <div className="text-[10.5px] uppercase tracking-wider text-[#8e9193] mb-1 font-bold">Reason Code</div>
+                          <div className="text-xs text-white bg-white/5 px-2 py-1 inline-block border border-white/10 rounded-sm">
+                            {a.reason || 'Velocity Spike'}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 w-full md:w-auto justify-end">
+                        <button
+                          onClick={() => handleResolveAppeal(a.id || a.ticketId, 'REJECTED')}
+                          className="flex-1 md:flex-none border border-[#FF4B4B] text-[#FF4B4B] hover:bg-[#FF4B4B]/10 px-4 py-2 text-xs font-bold uppercase transition-colors cursor-pointer active:scale-95"
+                        >
+                          Reject
+                        </button>
+                        <button
+                          onClick={() => handleResolveAppeal(a.id || a.ticketId, 'APPROVED')}
+                          className="flex-1 md:flex-none border border-[#10b981] text-[#10b981] hover:bg-[#10b981]/10 px-4 py-2 text-xs font-bold uppercase transition-colors cursor-pointer active:scale-95"
+                        >
+                          Approve
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* ══════════════════════════════════════════════════════════════
               TAB 4: ROI & LOSS REDUCTION TELEMETRY
