@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import jsQR from 'jsqr';
 import { QrCode, Camera, Upload, ArrowLeft, X, AlertTriangle, CheckCircle2, RefreshCw, Image as ImageIcon } from 'lucide-react';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { translations } from '../translations';
+
+const PermissionHelper = registerPlugin('PermissionHelper');
 
 export default function QrScannerModal({ onClose, onScanSuccess, lang = 'en' }) {
   const t = translations[lang] || translations.en;
@@ -140,6 +143,92 @@ export default function QrScannerModal({ onClose, onScanSuccess, lang = 'en' }) 
     }
   };
 
+  const decodeDataUrlOrImage = (imageSrc) => {
+    const img = new Image();
+    img.onload = () => {
+      const tryDecodeAtScale = (maxDim) => {
+        let w = img.width;
+        let h = img.height;
+
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = w;
+        offCanvas.height = h;
+        const ctx = offCanvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, w, h);
+
+        const imgData = ctx.getImageData(0, 0, w, h);
+        return jsQR(imgData.data, w, h, { inversionAttempts: 'attemptBoth' });
+      };
+
+      // Pass 1: Scaled to 1000px (optimal for jsQR)
+      let code = tryDecodeAtScale(1000);
+
+      // Pass 2: Scaled to 600px (optimal for zoomed/cropped screenshots)
+      if (!code || !code.data) {
+        code = tryDecodeAtScale(600);
+      }
+
+      // Pass 3: Original size if under 1500px
+      if ((!code || !code.data) && img.width <= 1500) {
+        code = tryDecodeAtScale(img.width);
+      }
+
+      setIsDecodingFile(false);
+
+      if (code && code.data) {
+        setDecodingStatus('QR Code Detected!');
+        parseAndComplete(code.data);
+      } else {
+        setDecodingStatus('No QR code detected. Please ensure the QR code is clearly visible and well-lit.');
+        setTimeout(() => setDecodingStatus(null), 4000);
+      }
+    };
+
+    img.onerror = () => {
+      setIsDecodingFile(false);
+      setDecodingStatus('Could not load image. Please select another picture.');
+      setTimeout(() => setDecodingStatus(null), 3000);
+    };
+
+    img.src = imageSrc;
+  };
+
+  const triggerGalleryPicker = async () => {
+    // 1. Direct Native Android Photo Picker Intent via Capacitor Bridge
+    if (Capacitor.isNativePlatform() || window.Capacitor?.isNativePlatform?.()) {
+      try {
+        setIsDecodingFile(true);
+        setDecodingStatus('Opening gallery...');
+        const res = await PermissionHelper.pickImage();
+        if (res && res.dataUrl) {
+          setDecodingStatus('Scanning QR image from gallery...');
+          decodeDataUrlOrImage(res.dataUrl);
+          return;
+        }
+      } catch (err) {
+        console.warn('Native picker cancelled or fallback:', err);
+        setIsDecodingFile(false);
+        setDecodingStatus(null);
+      }
+    }
+
+    // 2. Web Browser Fallback
+    const inputEl = document.getElementById('qr-gallery-file-input') || fileInputRef.current;
+    if (inputEl) {
+      inputEl.click();
+    }
+  };
+
   // High-Performance Multi-Scale QR Decoder for Gallery Photos
   const handleGalleryUpload = async (e) => {
     const file = e.target.files && e.target.files[0];
@@ -165,66 +254,10 @@ export default function QrScannerModal({ onClose, onScanSuccess, lang = 'en' }) 
       }
     }
 
-    // 2. Multi-Pass jsQR with Dynamic Downscaling (handles 12MP-50MP camera photos without lag)
+    // 2. Multi-Pass jsQR with Dynamic Downscaling
     const reader = new FileReader();
     reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const tryDecodeAtScale = (maxDim) => {
-          let w = img.width;
-          let h = img.height;
-
-          if (w > maxDim || h > maxDim) {
-            if (w > h) {
-              h = Math.round((h * maxDim) / w);
-              w = maxDim;
-            } else {
-              w = Math.round((w * maxDim) / h);
-              h = maxDim;
-            }
-          }
-
-          const offCanvas = document.createElement('canvas');
-          offCanvas.width = w;
-          offCanvas.height = h;
-          const ctx = offCanvas.getContext('2d', { willReadFrequently: true });
-          ctx.drawImage(img, 0, 0, w, h);
-
-          const imgData = ctx.getImageData(0, 0, w, h);
-          return jsQR(imgData.data, w, h, { inversionAttempts: 'attemptBoth' });
-        };
-
-        // Pass 1: Scaled to 1000px (optimal for jsQR)
-        let code = tryDecodeAtScale(1000);
-
-        // Pass 2: Scaled to 600px (optimal for zoomed/cropped screenshots)
-        if (!code || !code.data) {
-          code = tryDecodeAtScale(600);
-        }
-
-        // Pass 3: Original size if under 1500px
-        if ((!code || !code.data) && img.width <= 1500) {
-          code = tryDecodeAtScale(img.width);
-        }
-
-        setIsDecodingFile(false);
-
-        if (code && code.data) {
-          setDecodingStatus('QR Code Detected!');
-          parseAndComplete(code.data);
-        } else {
-          setDecodingStatus('No QR code detected. Please ensure the QR code is clearly visible and well-lit.');
-          setTimeout(() => setDecodingStatus(null), 4000);
-        }
-      };
-
-      img.onerror = () => {
-        setIsDecodingFile(false);
-        setDecodingStatus('Could not load image. Please select another picture.');
-        setTimeout(() => setDecodingStatus(null), 3000);
-      };
-
-      img.src = event.target.result;
+      decodeDataUrlOrImage(event.target.result);
     };
 
     reader.onerror = () => {
@@ -323,23 +356,30 @@ export default function QrScannerModal({ onClose, onScanSuccess, lang = 'en' }) 
             </div>
           </div>
 
-          {/* Direct Full-Coverage File Input for 100% Guaranteed Android Gallery Chooser */}
-          <div className="relative w-full overflow-hidden">
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handleGalleryUpload} 
-              className="absolute inset-0 w-full h-full opacity-0 z-30 cursor-pointer"
-            />
-            <div className="btn-tier-1 w-full py-3.5 text-xs font-semibold flex items-center justify-center gap-2 pointer-events-none shadow-[0_4px_16px_rgba(255,255,255,0.15)] active:scale-[0.98]">
-              {isDecodingFile ? (
-                <RefreshCw className="w-4 h-4 text-black animate-spin" />
-              ) : (
-                <Upload className="w-4 h-4 text-black" />
-              )}
-              <span>{isDecodingFile ? 'Decoding QR Code...' : 'Upload UPI QR from Gallery'}</span>
-            </div>
-          </div>
+          {/* Hidden input — ref.click() is the only reliable file picker trigger in Android WebView */}
+          <input
+            id="qr-gallery-file-input"
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleGalleryUpload}
+            style={{ position: 'fixed', top: '-200px', left: '-200px', width: '1px', height: '1px', opacity: 0 }}
+            tabIndex={-1}
+            aria-hidden="true"
+          />
+          <button
+            type="button"
+            disabled={isDecodingFile}
+            onClick={triggerGalleryPicker}
+            className="btn-tier-1 w-full py-3.5 text-xs font-semibold flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(255,255,255,0.15)] active:scale-[0.98] disabled:opacity-60"
+          >
+            {isDecodingFile ? (
+              <RefreshCw className="w-4 h-4 text-black animate-spin" />
+            ) : (
+              <Upload className="w-4 h-4 text-black" />
+            )}
+            <span>{isDecodingFile ? 'Decoding QR Code...' : 'Upload UPI QR from Gallery'}</span>
+          </button>
 
           {/* Demo Scenario Test Buttons */}
           <div className="flex gap-2.5 pt-1 border-t border-[#2A2A2E]">

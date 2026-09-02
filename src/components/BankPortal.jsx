@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { INITIAL_THREAT_RECORDS } from '../threatData.js';
 import { playRegionalVoiceWarning, playThreatSiren } from '../utils/audioAlerts.js';
+import IndiaRealMap from './IndiaRealMap.jsx';
 
 // ════════════════════════════════════════════════════════════════════════════════
 // 100% INDIA GEOSPATIAL FRAUD THREAT DATASET (State-by-State Drilldown & PIN Codes)
@@ -31,7 +32,8 @@ const INDIA_STATES_HEATMAP_DATA = [
     dominantBranchIFSC: ['SBIN0001234', 'PUNB0182400', 'IPOS0000001'],
     severity: 'CRITICAL',
     vulnerabilityRank: '#1',
-    coordinates: { x: 67, y: 44 },
+    coordinates: { x: 440, y: 355 },
+    path: "M 415,330 L 465,330 L 475,380 L 430,385 L 415,355 Z",
     pinCodes: [
       { pin: '815351', district: 'Jamtara', mules: 1420, blocked: '₹8.42 Cr', type: 'KYC' },
       { pin: '814112', district: 'Deoghar', mules: 980, blocked: '₹5.15 Cr', type: 'POWER_CUT' },
@@ -52,7 +54,8 @@ const INDIA_STATES_HEATMAP_DATA = [
     dominantBranchIFSC: ['HDFC0001842', 'UTIB0002914', 'INDB0000412'],
     severity: 'CRITICAL',
     vulnerabilityRank: '#2',
-    coordinates: { x: 38, y: 28 },
+    coordinates: { x: 265, y: 200 },
+    path: "M 245,175 L 290,170 L 295,225 L 255,225 Z",
     pinCodes: [
       { pin: '122107', district: 'Nuh/Mewat', mules: 2180, blocked: '₹11.60 Cr', type: 'SEXTO' },
       { pin: '122002', district: 'Gurugram', mules: 890, blocked: '₹4.10 Cr', type: 'STOCK' },
@@ -72,7 +75,8 @@ const INDIA_STATES_HEATMAP_DATA = [
     dominantBranchIFSC: ['BARB0BHARAT', 'SBIN0000318', 'AUBL0002011'],
     severity: 'CRITICAL',
     vulnerabilityRank: '#3',
-    coordinates: { x: 32, y: 35 },
+    coordinates: { x: 195, y: 265 },
+    path: "M 150,210 L 245,195 L 265,285 L 205,340 L 135,280 Z",
     pinCodes: [
       { pin: '321001', district: 'Bharatpur', mules: 1840, blocked: '₹9.15 Cr', type: 'OLX_ARMY' },
       { pin: '301001', district: 'Alwar', mules: 810, blocked: '₹3.40 Cr', type: 'ADVANCE_QR' },
@@ -92,7 +96,8 @@ const INDIA_STATES_HEATMAP_DATA = [
     dominantBranchIFSC: ['ICIC0000007', 'HDFC0000003', 'KKBK0000195'],
     severity: 'CRITICAL',
     vulnerabilityRank: '#4',
-    coordinates: { x: 41, y: 30 },
+    coordinates: { x: 285, y: 215 },
+    path: "M 275,208 L 295,208 L 295,222 L 275,222 Z",
     pinCodes: [
       { pin: '110001', district: 'Connaught Pl', mules: 1120, blocked: '₹14.80 Cr', type: 'DIGITAL_ARREST' },
       { pin: '201309', district: 'Noida Sec 62', mules: 810, blocked: '₹6.75 Cr', type: 'POWER_CUT' },
@@ -112,7 +117,8 @@ const INDIA_STATES_HEATMAP_DATA = [
     dominantBranchIFSC: ['BDBL0000124', 'SBIN0004087', 'UCBA0000014'],
     severity: 'CRITICAL',
     vulnerabilityRank: '#5',
-    coordinates: { x: 74, y: 48 },
+    coordinates: { x: 475, y: 380 },
+    path: "M 465,300 L 490,290 L 495,410 L 455,415 L 465,350 Z",
     pinCodes: [
       { pin: '700091', district: 'Salt Lake V', mules: 950, blocked: '₹8.20 Cr', type: 'TECH_SUPPORT' },
       { pin: '700001', district: 'Kolkata GPO', mules: 720, blocked: '₹3.10 Cr', type: 'POWER_CUT' },
@@ -132,7 +138,8 @@ const INDIA_STATES_HEATMAP_DATA = [
     dominantBranchIFSC: ['HDFC0000060', 'ICIC0000004', 'SCBL0036001'],
     severity: 'HIGH',
     vulnerabilityRank: '#6',
-    coordinates: { x: 33, y: 56 },
+    coordinates: { x: 235, y: 460 },
+    path: "M 160,420 L 290,410 L 310,510 L 205,535 L 150,470 Z",
     pinCodes: [
       { pin: '400051', district: 'Mumbai BKC', mules: 780, blocked: '₹18.50 Cr', type: 'STOCK_IPO' },
       { pin: '411001', district: 'Pune Cantt', mules: 620, blocked: '₹6.20 Cr', type: 'PRE_IPO' },
@@ -152,7 +159,8 @@ const INDIA_STATES_HEATMAP_DATA = [
     dominantBranchIFSC: ['CNRB0000214', 'UTIB0000122', 'SBIN0040012'],
     severity: 'HIGH',
     vulnerabilityRank: '#7',
-    coordinates: { x: 42, y: 72 },
+    coordinates: { x: 245, y: 585 },
+    path: "M 195,525 L 270,525 L 270,645 L 210,635 L 185,570 Z",
     pinCodes: [
       { pin: '560034', district: 'Koramangala', mules: 540, blocked: '₹9.40 Cr', type: 'TELEGRAM_TASK' },
       { pin: '560066', district: 'Whitefield', mules: 410, blocked: '₹5.10 Cr', type: 'CRYPTO_BOT' },
@@ -172,7 +180,8 @@ const INDIA_STATES_HEATMAP_DATA = [
     dominantBranchIFSC: ['BARB0SURATX', 'ICIC0000188', 'KKBK0000841'],
     severity: 'HIGH',
     vulnerabilityRank: '#8',
-    coordinates: { x: 26, y: 46 },
+    coordinates: { x: 130, y: 360 },
+    path: "M 95,325 L 180,325 L 185,410 L 135,430 L 80,380 Z",
     pinCodes: [
       { pin: '395003', district: 'Surat Ring Rd', mules: 620, blocked: '₹8.90 Cr', type: 'DABBA_TRADE' },
       { pin: '380001', district: 'Ahmedabad GPO', mules: 510, blocked: '₹4.30 Cr', type: 'IPO_ALLOT' }
@@ -191,10 +200,152 @@ const INDIA_STATES_HEATMAP_DATA = [
     dominantBranchIFSC: ['UBIN0800015', 'HDFC0000547', 'SBIN0011662'],
     severity: 'HIGH',
     vulnerabilityRank: '#9',
-    coordinates: { x: 48, y: 62 },
+    coordinates: { x: 300, y: 505 },
+    path: "M 275,475 L 350,470 L 345,545 L 275,540 Z",
     pinCodes: [
       { pin: '500081', district: 'HITEC City', mules: 480, blocked: '₹7.60 Cr', type: 'LOAN_APP' },
       { pin: '500003', district: 'Secunderabad', mules: 360, blocked: '₹4.10 Cr', type: 'BETTING' }
+    ]
+  },
+  {
+    id: 'UP',
+    state: 'UTTAR PRADESH',
+    capital: 'Lucknow',
+    hotspots: 'Noida, Greater Noida, Lucknow, Kanpur',
+    riskIndex: 89.1,
+    activeThreatNodes: 2780,
+    blockedVolumeCr: '21.30',
+    primaryModus: 'Fake Job Offers, Electricity Bill Scam & Loan Apps',
+    topMuleBanks: ['State Bank of India', 'Punjab National Bank', 'Bank of Baroda'],
+    dominantBranchIFSC: ['SBIN0005021', 'PUNB0241000', 'BARB0NOIDAX'],
+    severity: 'HIGH',
+    vulnerabilityRank: '#10',
+    coordinates: { x: 345, y: 255 },
+    path: "M 285,200 L 415,225 L 435,300 L 345,320 L 285,250 Z",
+    pinCodes: [
+      { pin: '201301', district: 'Noida Sec 18', mules: 920, blocked: '₹9.80 Cr', type: 'FAKE_JOB' },
+      { pin: '226001', district: 'Lucknow GPO', mules: 680, blocked: '₹5.40 Cr', type: 'POWER_CUT' },
+      { pin: '208001', district: 'Kanpur', mules: 440, blocked: '₹2.90 Cr', type: 'LOAN_APP' }
+    ]
+  },
+  {
+    id: 'TN',
+    state: 'TAMIL NADU',
+    capital: 'Chennai',
+    hotspots: 'Chennai OMR, Coimbatore, Madurai',
+    riskIndex: 81.4,
+    activeThreatNodes: 1650,
+    blockedVolumeCr: '11.20',
+    primaryModus: 'Part-Time Work Fraud, FedEx Customs Scam',
+    topMuleBanks: ['Indian Bank', 'Canara Bank', 'HDFC Bank'],
+    dominantBranchIFSC: ['IDIB000C024', 'CNRB0001004', 'HDFC0000128'],
+    severity: 'HIGH',
+    vulnerabilityRank: '#11',
+    coordinates: { x: 285, y: 665 },
+    path: "M 255,615 L 320,615 L 300,735 L 255,735 Z",
+    pinCodes: [
+      { pin: '600096', district: 'Chennai OMR', mules: 510, blocked: '₹5.80 Cr', type: 'PART_TIME' },
+      { pin: '641001', district: 'Coimbatore', mules: 380, blocked: '₹3.40 Cr', type: 'CUSTOMS' }
+    ]
+  },
+  {
+    id: 'OD',
+    state: 'ODISHA',
+    capital: 'Bhubaneswar',
+    hotspots: 'Bhubaneswar, Cuttack, Rourkela',
+    riskIndex: 79.5,
+    activeThreatNodes: 1240,
+    blockedVolumeCr: '8.40',
+    primaryModus: 'SIM Swap, Lottery Reward & Fake KYC Calls',
+    topMuleBanks: ['State Bank of India', 'UCO Bank', 'Axis Bank'],
+    dominantBranchIFSC: ['SBIN0000041', 'UCBA0000188', 'UTIB0000341'],
+    severity: 'MEDIUM',
+    vulnerabilityRank: '#12',
+    coordinates: { x: 415, y: 440 },
+    path: "M 395,385 L 465,400 L 440,490 L 380,455 Z",
+    pinCodes: [
+      { pin: '751001', district: 'Bhubaneswar', mules: 420, blocked: '₹4.20 Cr', type: 'SIM_SWAP' },
+      { pin: '753001', district: 'Cuttack', mules: 310, blocked: '₹2.10 Cr', type: 'REWARD' }
+    ]
+  },
+  {
+    id: 'KL',
+    state: 'KERALA',
+    capital: 'Thiruvananthapuram',
+    hotspots: 'Kochi, Kozhikode, Thiruvananthapuram',
+    riskIndex: 78.2,
+    activeThreatNodes: 1150,
+    blockedVolumeCr: '7.90',
+    primaryModus: 'Crypto Arbitrage, Online Trading & NRI Impersonation',
+    topMuleBanks: ['Federal Bank', 'South Indian Bank', 'State Bank of India'],
+    dominantBranchIFSC: ['FDRL0001001', 'SIBL0000124', 'SBIN0000941'],
+    severity: 'MEDIUM',
+    vulnerabilityRank: '#13',
+    coordinates: { x: 235, y: 700 },
+    path: "M 220,640 L 255,640 L 260,740 L 230,740 Z",
+    pinCodes: [
+      { pin: '682001', district: 'Kochi', mules: 390, blocked: '₹4.30 Cr', type: 'CRYPTO_BOT' },
+      { pin: '695001', district: 'Trivandrum', mules: 280, blocked: '₹2.20 Cr', type: 'TRADING' }
+    ]
+  },
+  {
+    id: 'MP',
+    state: 'MADHYA PRADESH',
+    capital: 'Bhopal',
+    hotspots: 'Indore, Bhopal, Jabalpur, Gwalior',
+    riskIndex: 82.3,
+    activeThreatNodes: 1720,
+    blockedVolumeCr: '12.10',
+    primaryModus: 'Fake Matrimonial Scams & Instant Micro-Loan Apps',
+    topMuleBanks: ['State Bank of India', 'Bank of India', 'Punjab National Bank'],
+    dominantBranchIFSC: ['SBIN0001052', 'BKID0008801', 'PUNB0024100'],
+    severity: 'HIGH',
+    vulnerabilityRank: '#14',
+    coordinates: { x: 285, y: 345 },
+    path: "M 225,285 L 365,285 L 365,395 L 225,390 Z",
+    pinCodes: [
+      { pin: '452001', district: 'Indore', mules: 490, blocked: '₹4.90 Cr', type: 'LOAN_APP' },
+      { pin: '462001', district: 'Bhopal', mules: 410, blocked: '₹3.80 Cr', type: 'MATRIMONY' }
+    ]
+  },
+  {
+    id: 'JK',
+    state: 'JAMMU & KASHMIR / LADAKH',
+    capital: 'Srinagar / Jammu',
+    hotspots: 'Srinagar, Jammu, Leh',
+    riskIndex: 71.0,
+    activeThreatNodes: 640,
+    blockedVolumeCr: '3.40',
+    primaryModus: 'Telecom Tower Lease & Fake Government Schemes',
+    topMuleBanks: ['J&K Bank', 'State Bank of India'],
+    dominantBranchIFSC: ['JAKA0POLOX', 'SBIN0000722'],
+    severity: 'GUARDED',
+    vulnerabilityRank: '#15',
+    coordinates: { x: 275, y: 95 },
+    path: "M 240,40 L 325,40 L 340,115 L 285,150 L 235,120 Z",
+    pinCodes: [
+      { pin: '190001', district: 'Srinagar', mules: 210, blocked: '₹1.80 Cr', type: 'GOV_SCHEME' },
+      { pin: '180001', district: 'Jammu', mules: 180, blocked: '₹1.20 Cr', type: 'TOWER_LEASE' }
+    ]
+  },
+  {
+    id: 'AS',
+    state: 'ASSAM & NORTH-EAST',
+    capital: 'Guwahati',
+    hotspots: 'Guwahati, Silchar, Dibrugarh',
+    riskIndex: 76.5,
+    activeThreatNodes: 980,
+    blockedVolumeCr: '5.60',
+    primaryModus: 'Teer Betting Apps & Illegal Border SIM Farming',
+    topMuleBanks: ['State Bank of India', 'Assam Gramin Vikash Bank', 'UCO Bank'],
+    dominantBranchIFSC: ['SBIN0000078', 'AGVB0001001', 'UCBA0000214'],
+    severity: 'GUARDED',
+    vulnerabilityRank: '#16',
+    coordinates: { x: 550, y: 300 },
+    path: "M 515,260 L 595,250 L 610,325 L 545,355 L 515,310 Z",
+    pinCodes: [
+      { pin: '781001', district: 'Guwahati', mules: 340, blocked: '₹3.10 Cr', type: 'BETTING' },
+      { pin: '788001', district: 'Silchar', mules: 210, blocked: '₹1.40 Cr', type: 'SIM_FARM' }
     ]
   }
 ];
@@ -326,52 +477,55 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
         const data = await appealsRes.json();
         const incomingAppeals = Array.isArray(data.appeals) ? data.appeals : (Array.isArray(data.data) ? data.data : []);
         
-        if (incomingAppeals.length > 0) {
-          setAppeals(prev => {
-            const map = new Map();
-            // Seed with existing local items (preserving local resolutions)
-            prev.forEach(item => {
-              const key = item.ticketId || item.appealId || item.id;
-              if (key) map.set(key, item);
-            });
-
-            // Merge incoming from backend
-            incomingAppeals.forEach(inc => {
-              const id = inc.appealId || inc.ticketId || inc.id;
-              if (!id) return;
-              const existing = map.get(id);
-              
-              // If already locally resolved, preserve local status unless backend confirms
-              if (existing && existing.status !== 'PENDING' && inc.status === 'PENDING_REVIEW') {
-                return;
-              }
-
-              const statusNormalized = (inc.status === 'APPROVED_WHITELISTED' || inc.status === 'APPROVED')
-                ? 'APPROVED'
-                : (inc.status === 'REJECTED' ? 'REJECTED' : 'PENDING');
-
-              map.set(id, {
-                id,
-                ticketId: id,
-                identifier: inc.vpa ? `VPA: ${inc.vpa}` : (inc.identifier || 'Flagged Identifier'),
-                vpa: inc.vpa || inc.identifier || 'Unknown VPA',
-                amount: inc.amount ? (inc.amount.toString().startsWith('₹') ? inc.amount : `₹${Number(inc.amount).toLocaleString('en-IN')}`) : '₹12,450.00',
-                reason: inc.reason || 'Velocity Spike',
-                details: inc.evidenceDescription || inc.details || 'Dispute submitted by citizen via mobile app.',
-                status: statusNormalized,
-                timestamp: inc.submittedAt ? new Date(inc.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (existing?.timestamp || 'Recent'),
-                resolvedBy: inc.resolvedBy || (statusNormalized !== 'PENDING' ? (existing?.resolvedBy || 'Compliance Officer') : null),
-                resolvedAt: inc.resolvedAt ? new Date(inc.resolvedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (existing?.resolvedAt || null)
-              });
-            });
-
-            const merged = Array.from(map.values());
-            try {
-              localStorage.setItem('verix_bank_appeals', JSON.stringify(merged));
-            } catch (e) {}
-            return merged;
+        // FIX: Always run merge even when backend returns [] (server restart / empty state).
+        // This prevents stale resolved/pending tickets from lingering after a server restart.
+        setAppeals(prev => {
+          // Build map from existing LOCAL state
+          const map = new Map();
+          prev.forEach(item => {
+            const key = item.ticketId || item.appealId || item.id;
+            // Only keep items that were locally resolved (not SEED placeholders with no backend record)
+            if (key && (item.status === 'APPROVED' || item.status === 'REJECTED')) {
+              map.set(key, item);
+            }
           });
-        }
+
+          // Merge incoming from backend (always authoritative)
+          incomingAppeals.forEach(inc => {
+            const id = inc.appealId || inc.ticketId || inc.id;
+            if (!id) return;
+            const existing = map.get(id);
+            
+            // If already locally resolved, preserve local status unless backend confirms resolution
+            if (existing && existing.status !== 'PENDING' && inc.status === 'PENDING_REVIEW') {
+              return;
+            }
+
+            const statusNormalized = (inc.status === 'APPROVED_WHITELISTED' || inc.status === 'APPROVED')
+              ? 'APPROVED'
+              : (inc.status === 'REJECTED' ? 'REJECTED' : 'PENDING');
+
+            map.set(id, {
+              id,
+              ticketId: id,
+              identifier: inc.vpa ? `VPA: ${inc.vpa}` : (inc.identifier || 'Flagged Identifier'),
+              vpa: inc.vpa || inc.identifier || 'Unknown VPA',
+              amount: inc.amount ? (inc.amount.toString().startsWith('₹') ? inc.amount : `₹${Number(inc.amount).toLocaleString('en-IN')}`) : '₹12,450.00',
+              reason: inc.reason || 'Velocity Spike',
+              details: inc.evidenceDescription || inc.details || 'Dispute submitted by citizen via mobile app.',
+              status: statusNormalized,
+              timestamp: inc.submittedAt ? new Date(inc.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (existing?.timestamp || 'Recent'),
+              resolvedBy: inc.resolvedBy || (statusNormalized !== 'PENDING' ? (existing?.resolvedBy || 'Compliance Officer') : null),
+              resolvedAt: inc.resolvedAt ? new Date(inc.resolvedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (existing?.resolvedAt || null)
+            });
+          });
+
+          const merged = Array.from(map.values());
+          try {
+            localStorage.setItem('verix_bank_appeals', JSON.stringify(merged));
+          } catch (e) {}
+          return merged;
+        });
       }
 
       if (threatsRes && threatsRes.ok) {
@@ -913,25 +1067,25 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
               {/* Top Split (60% Map Canvas | 40% Selected State Dossier) */}
               <div className="flex flex-1 gap-3 overflow-hidden min-h-0">
                 
-                {/* Left 60%: Interactive SVG India Radar Map */}
-                <div className="w-[60%] bg-[#10141C] border border-white/[0.08] flex flex-col overflow-hidden relative">
+                {/* Left 60%: Interactive Real Satellite & Topographic India Threat Map */}
+                <div className="w-[60%] bg-[#10141C] border border-white/[0.08] flex flex-col overflow-hidden relative min-h-[440px]">
                   
                   {/* Map Header */}
-                  <div className="p-3 border-b border-white/[0.08] flex justify-between items-center bg-[#171E2B]/50">
+                  <div className="p-3 border-b border-white/[0.08] flex justify-between items-center bg-[#171E2B]/50 z-10">
                     <div className="flex items-center gap-2">
                       <Satellite className="w-4 h-4 text-[#00F0A0]" />
-                      <span className="text-xs font-bold text-white tracking-wider uppercase">
-                        Satellite India Geospatial Telemetry
+                      <span className="text-xs font-bold text-white tracking-wider uppercase font-mono">
+                        Real India Geospatial Threat Radar • Live Satellite & Topography
                       </span>
                     </div>
 
                     {/* State Selector Dropdown */}
                     <div className="flex items-center gap-2">
-                      <label className="text-[10px] text-[#e4bdba] uppercase">Select State:</label>
+                      <label className="text-[10px] text-[#e4bdba] uppercase font-mono">Select State:</label>
                       <select
                         value={selectedStateId}
                         onChange={(e) => setSelectedStateId(e.target.value)}
-                        className="bg-[#10141C] border border-white/[0.08] text-xs text-[#00F0A0] px-2 py-1 focus:outline-none cursor-pointer"
+                        className="bg-[#10141C] border border-white/[0.08] text-xs text-[#00F0A0] px-2 py-1 focus:outline-none cursor-pointer rounded font-mono"
                       >
                         {INDIA_STATES_HEATMAP_DATA.map(s => (
                           <option key={s.id} value={s.id}>
@@ -942,71 +1096,12 @@ export default function BankPortal({ backendUrl, onOpenMobilePortal }) {
                     </div>
                   </div>
 
-                  {/* Vector Map Canvas */}
-                  <div className="flex-1 relative flex items-center justify-center p-4 overflow-hidden bg-[#05080E]">
-                    {/* Radar Scanning Line */}
-                    <div className="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(rgba(0,240,160,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,240,160,0.1)_1px,transparent_1px)] bg-[size:32px_32px]" />
-
-                    {/* India Map Geometric Representation */}
-                    <svg viewBox="0 0 100 100" className="w-full h-full max-h-[380px] filter drop-shadow-[0_0_15px_rgba(0,240,160,0.15)]">
-                      {/* Outline Polygon */}
-                      <polygon
-                        points="35,10 45,8 55,14 62,22 68,26 80,30 85,38 78,45 82,55 72,60 60,65 52,78 45,92 38,82 32,68 25,58 20,45 22,32 30,22"
-                        fill="#101726"
-                        stroke="#00F0A0"
-                        strokeWidth="0.8"
-                        strokeDasharray="2,1"
-                      />
-
-                      {/* State Nodes */}
-                      {INDIA_STATES_HEATMAP_DATA.map((state) => {
-                        const isSelected = state.id === selectedStateId;
-                        const isCritical = state.riskIndex >= 90;
-                        return (
-                          <g
-                            key={state.id}
-                            className="cursor-pointer transition-all hover:scale-125"
-                            onClick={() => setSelectedStateId(state.id)}
-                          >
-                            <circle
-                              cx={state.coordinates.x}
-                              cy={state.coordinates.y}
-                              r={isSelected ? 3.5 : 2}
-                              fill={isCritical ? '#FF4B4B' : '#00D2FF'}
-                              className={isCritical ? 'animate-pulse' : ''}
-                            />
-                            {isSelected && (
-                              <circle
-                                cx={state.coordinates.x}
-                                cy={state.coordinates.y}
-                                r={6}
-                                fill="none"
-                                stroke="#00F0A0"
-                                strokeWidth="0.8"
-                                className="animate-ping"
-                              />
-                            )}
-                            <text
-                              x={state.coordinates.x + 3}
-                              y={state.coordinates.y + 1}
-                              fontSize="3.2"
-                              fill={isSelected ? '#00F0A0' : '#fadcd9'}
-                              fontWeight={isSelected ? 'bold' : 'normal'}
-                              className="font-mono select-none"
-                            >
-                              {state.id} ({state.riskIndex}%)
-                            </text>
-                          </g>
-                        );
-                      })}
-                    </svg>
-
-                    {/* Bottom Status Overlay */}
-                    <div className="absolute bottom-2 left-3 right-3 flex justify-between text-[10px] text-[#e4bdba] bg-[#10141C]/80 p-2 border border-white/[0.08]">
-                      <span>CURRENT JURISDICTION: <strong className="text-[#00F0A0]">{selectedState.state}</strong></span>
-                      <span>ACTIVE THREAT NODES: <strong className="text-white">{selectedState.activeThreatNodes.toLocaleString()}</strong></span>
-                      <span>24H BLOCKED: <strong className="text-[#FF4B4B]">₹{selectedState.blockedVolumeCr} Cr</strong></span>
-                    </div>
+                  {/* Real Leaflet Satellite / Topo Canvas Component */}
+                  <div className="flex-1 relative w-full h-full overflow-hidden">
+                    <IndiaRealMap 
+                      selectedStateId={selectedStateId}
+                      onSelectState={(id) => setSelectedStateId(id)}
+                    />
                   </div>
                 </div>
 

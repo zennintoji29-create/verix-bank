@@ -62,8 +62,88 @@ export default function UpiCheckScreen({ onBack, backendUrl, user, initialPreset
     return bankMap[prefix] || 'Indian Commercial Bank';
   };
 
+  // Sync preset data if updated from scanner or external navigation
+  useEffect(() => {
+    if (initialPreset) {
+      if (initialPreset.vpa) {
+        setVpa(initialPreset.vpa);
+        setTransferMode('vpa');
+      }
+      if (initialPreset.amount) setAmount(initialPreset.amount.toString());
+      if (initialPreset.note) setNote(initialPreset.note);
+      if (initialPreset.isOnCall !== undefined) setIsOnCall(initialPreset.isOnCall);
+      if (initialPreset.caller) setActiveCaller(initialPreset.caller);
+    }
+  }, [initialPreset]);
+
   const directGalleryRef = useRef(null);
   const [decodingGallery, setDecodingGallery] = useState(false);
+
+  const decodeDataUrlOrImage = (imageSrc) => {
+    const img = new Image();
+    img.onload = () => {
+      const tryDecode = (maxDim) => {
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = w;
+        offCanvas.height = h;
+        const ctx = offCanvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, w, h);
+        const imgData = ctx.getImageData(0, 0, w, h);
+        return jsQR(imgData.data, w, h, { inversionAttempts: 'attemptBoth' });
+      };
+
+      let code = tryDecode(1000);
+      if (!code || !code.data) code = tryDecode(600);
+      if (!code || !code.data) code = tryDecode(img.width);
+
+      setDecodingGallery(false);
+
+      if (code && code.data) {
+        applyParsedQr(code.data);
+      } else {
+        alert('No QR code detected in the selected image. Please choose a clearer picture.');
+      }
+    };
+    img.onerror = () => {
+      setDecodingGallery(false);
+      alert('Could not read image file. Please try another image.');
+    };
+    img.src = imageSrc;
+  };
+
+  const triggerGalleryUpload = async () => {
+    // 1. Direct Native Android Photo Picker Intent via Capacitor Bridge
+    if (Capacitor.isNativePlatform() || window.Capacitor?.isNativePlatform?.()) {
+      try {
+        setDecodingGallery(true);
+        const res = await PermissionHelper.pickImage();
+        if (res && res.dataUrl) {
+          decodeDataUrlOrImage(res.dataUrl);
+          return;
+        }
+      } catch (err) {
+        console.warn('[Native Photo Picker cancelled/fallback]:', err);
+        setDecodingGallery(false);
+      }
+    }
+
+    // 2. Web Browser Fallback
+    const el = document.getElementById('direct-gallery-qr-input') || directGalleryRef.current;
+    if (el) {
+      el.click();
+    }
+  };
 
   const handleDirectGalleryUpload = async (e) => {
     const file = e.target.files && e.target.files[0];
@@ -90,46 +170,11 @@ export default function UpiCheckScreen({ onBack, backendUrl, user, initialPreset
     // 2. Multi-Scale Progressive jsQR
     const reader = new FileReader();
     reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const tryDecode = (maxDim) => {
-          let w = img.width;
-          let h = img.height;
-          if (w > maxDim || h > maxDim) {
-            if (w > h) {
-              h = Math.round((h * maxDim) / w);
-              w = maxDim;
-            } else {
-              w = Math.round((w * maxDim) / h);
-              h = maxDim;
-            }
-          }
-          const offCanvas = document.createElement('canvas');
-          offCanvas.width = w;
-          offCanvas.height = h;
-          const ctx = offCanvas.getContext('2d', { willReadFrequently: true });
-          ctx.drawImage(img, 0, 0, w, h);
-          const imgData = ctx.getImageData(0, 0, w, h);
-          return jsQR(imgData.data, w, h, { inversionAttempts: 'attemptBoth' });
-        };
-
-        let code = tryDecode(1000);
-        if (!code || !code.data) code = tryDecode(600);
-        if (!code || !code.data) code = tryDecode(img.width);
-
-        setDecodingGallery(false);
-
-        if (code && code.data) {
-          applyParsedQr(code.data);
-        } else {
-          alert('No QR code detected in the selected image. Please choose a clearer picture.');
-        }
-      };
-      img.onerror = () => {
-        setDecodingGallery(false);
-        alert('Could not read image file.');
-      };
-      img.src = event.target.result;
+      decodeDataUrlOrImage(event.target.result);
+    };
+    reader.onerror = () => {
+      setDecodingGallery(false);
+      alert('Could not read image file. Please try another image.');
     };
     reader.readAsDataURL(file);
     e.target.value = '';
@@ -282,7 +327,9 @@ export default function UpiCheckScreen({ onBack, backendUrl, user, initialPreset
         console.log('[Backend evaluate failed, using intelligent local engine]:', e);
       }
 
-      if (!evaluation || isScamIdentifier || note.trim().length > 0) {
+      // Only apply local engine override when: backend failed OR identifier is a known scam pattern
+      // (do NOT override just because note has text — that would ruin clean transactions with notes)
+      if (!evaluation || isScamIdentifier) {
         const noteLower = note.toLowerCase();
         const extortionTriggers = [
           'police', 'arrest', 'complaint', 'legal', 'station', 'disconnect', 
@@ -834,20 +881,27 @@ export default function UpiCheckScreen({ onBack, backendUrl, user, initialPreset
         </button>
         <h2 className="text-[14px] font-bold text-[#F5F6FA] font-mono">Pre-Payment Sentinel</h2>
         
-        {/* Direct Full-Coverage Gallery File Input for 100% Android WebView Compatibility */}
+        {/* Gallery QR Upload — hidden input + ref.click() = guaranteed Android WebView file picker */}
+        <input
+          id="direct-gallery-qr-input"
+          ref={directGalleryRef}
+          type="file"
+          accept="image/*"
+          onChange={handleDirectGalleryUpload}
+          style={{ position: 'fixed', top: '-200px', left: '-200px', width: '1px', height: '1px', opacity: 0 }}
+          tabIndex={-1}
+          aria-hidden="true"
+        />
         <div className="flex items-center gap-1.5">
-          <div className="relative overflow-hidden flex items-center">
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handleDirectGalleryUpload} 
-              className="absolute inset-0 w-full h-full opacity-0 z-30 cursor-pointer"
-            />
-            <div className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full border border-[#262B3A] text-[#F5F6FA] bg-[#151823] pointer-events-none hover:bg-[#1C202E]">
-              {decodingGallery ? <RefreshCw className="w-3.5 h-3.5 text-[#3ECF7A] animate-spin" /> : <Upload className="w-3.5 h-3.5 text-[#3ECF7A] stroke-[2.5]" />}
-              <span className="hidden sm:inline">Upload QR</span>
-            </div>
-          </div>
+          <button
+            type="button"
+            disabled={decodingGallery}
+            onClick={triggerGalleryUpload}
+            className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full border border-[#262B3A] text-[#F5F6FA] bg-[#151823] active:scale-90 transition-all cursor-pointer hover:bg-[#1C202E] disabled:opacity-60"
+          >
+            {decodingGallery ? <RefreshCw className="w-3.5 h-3.5 text-[#3ECF7A] animate-spin" /> : <Upload className="w-3.5 h-3.5 text-[#3ECF7A] stroke-[2.5]" />}
+            <span className="hidden sm:inline">{decodingGallery ? 'Reading...' : 'Upload QR'}</span>
+          </button>
           <button
             onClick={() => setShowQrModal(true)}
             title="Scan QR Code"
